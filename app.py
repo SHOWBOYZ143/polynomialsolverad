@@ -1092,9 +1092,14 @@ def admin_stats_view():
 
     # ---------- Since columns ----------
     df["Inactive Since"] = df.apply(
-        lambda r: r["last_activity"].strftime("%Y-%m-%d")
-        if r["Inactive"] and r["last_activity"]
-        else "",
+        lambda r: (
+            r["last_activity"].strftime("%Y-%m-%d")
+        if (
+            not r["Inactive"]
+            and pd.notna(r["last_activity"])
+        )
+        else ""
+        ),
         axis=1
     )
 
