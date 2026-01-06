@@ -1099,11 +1099,19 @@ def admin_stats_view():
     )
 
     df["Active Since"] = df.apply(
-        lambda r: r["last_activity"].strftime("%Y-%m-%d")
-        if not r["Inactive"] and r["last_activity"]
-        else "",
+        lambda r: (
+            r["last_activity"].strftime("%Y-%m-%d")
+            if (
+                not r["Inactive"]
+                and pd.notna(r["last_activity"])
+            )
+            else ""
+        ),
         axis=1
     )
+
+
+
 
     # ---------- Normalised display ----------
     df["First Login"] = df["first_login"].apply(
