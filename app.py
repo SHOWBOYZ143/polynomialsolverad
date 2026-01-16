@@ -41,8 +41,14 @@ div[data-testid="metric-container"] {
 # App config
 # ======================================================
 st.set_page_config(page_title="Polynomial Solver Portal", layout="wide")
-DB_PATH = os.environ.get("POLY_DB_PATH", "polynomialsolver.db")
-MIRROR_DB_PATH = os.environ.get("POLY_MIRROR_DB_PATH", "dbforsql.db")
+DEFAULT_DB_DIR = "/mount/data" if os.path.isdir("/mount/data") else "."
+DB_PATH = os.environ.get(
+    "POLY_DB_PATH",
+    os.path.join(DEFAULT_DB_DIR, "polynomialsolver.db")
+)
+MIRROR_DB_PATH = os.environ.get(
+    "POLY_MIRROR_DB_PATH",
+    os.path.join(DEFAULT_DB_DIR, "dbforsql.db")
 
 # ======================================================
 # Time helpers
