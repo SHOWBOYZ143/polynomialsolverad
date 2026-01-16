@@ -41,7 +41,7 @@ div[data-testid="metric-container"] {
 # App config
 # ======================================================
 st.set_page_config(page_title="Polynomial Solver Portal", layout="wide")
-DB_PATH = "polynomialsolver.db"
+DB_PATH = os.environ.get("POLY_DB_PATH", "polynomialsolver.db")
 
 # ======================================================
 # Time helpers
@@ -669,50 +669,6 @@ def forced_password_change():
         st.session_state.first_login = 0
         st.success("Password updated")
         st.rerun()
-def user_stats_view():
-    st.subheader("My Statistics")
-
-    con = get_db()
-
-    total_solves = con.execute(
-        "SELECT COUNT(*) FROM history WHERE username=?",
-        (st.session_state.username,)
-    ).fetchone()[0]
-
-    last_solve = con.execute(
-        "SELECT MAX(created_at) FROM history WHERE username=?",
-        (st.session_state.username,)
-    ).fetchone()[0]
-
-    last_login = con.execute(
-        "SELECT last_login FROM users WHERE username=?",
-        (st.session_state.username,)
-    ).fetchone()[0]
-
-    con.close()
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(
-            label="Total Solves",
-            value=total_solves
-        )
-
-    with col2:
-        st.metric(
-            label="Last Solve",
-            value=human_time(last_solve)
-        )
-
-
-    st.markdown(
-        "<div style='margin-top:12px; margin-bottom:24px; border-bottom:1px solid #2a2d3a;'></div>",
-        unsafe_allow_html=True
-    )
-
-
-
 def solver_view():
     st.subheader("Polynomial Solver")
 
@@ -1346,10 +1302,6 @@ def create_user_view():
             st.error("Username, password, and phone number are required.")
             return
 
-        # DEBUG: Check database path
-        st.info(f"Database path: {os.path.abspath(DB_PATH)}")
-        st.info(f"Database exists: {os.path.exists(DB_PATH)}")
-
         ok, msg = create_user(
             username=u,
             pw=p,
@@ -1360,30 +1312,6 @@ def create_user_view():
 
         if ok:
             st.success(msg)
-            
-            # DEBUG: Verify user was created
-            st.write("---DEBUG INFO---")
-            con = get_db()
-            cur = con.cursor()
-            
-            # Check if user exists
-            check_user = cur.execute("SELECT * FROM users WHERE username=?", (u,)).fetchone()
-            st.write(f"User found in DB: {check_user is not None}")
-            if check_user:
-                st.write(f"User details: {check_user}")
-            
-            # Count all users
-            total_users = cur.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-            st.write(f"Total users in database: {total_users}")
-            
-            # List all usernames
-            all_users = cur.execute("SELECT username, role, phone FROM users").fetchall()
-            st.write("All users:")
-            for user_row in all_users:
-                st.write(f"  - {user_row}")
-            
-            con.close()
-            st.write("---END DEBUG---")
         else:
             st.error(msg)
 
@@ -1591,6 +1519,3 @@ else:
             admin_view()
         else:
             user_view()
-
-
-
