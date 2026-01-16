@@ -951,6 +951,22 @@ def solver_view():
 def view_users_view():
     st.subheader("All Users")
 
+     with st.expander("Database info"):
+        db_path = os.path.abspath(DB_PATH)
+        st.write(f"Database file: `{db_path}`")
+        db_exists = os.path.exists(DB_PATH)
+        st.write(f"Database exists: **{db_exists}**")
+        if db_exists:
+            db_size_kb = os.path.getsize(DB_PATH) / 1024
+            st.write(f"Database size: **{db_size_kb:.1f} KB**")
+            with open(DB_PATH, "rb") as db_file:
+                st.download_button(
+                    "Download database (SQLite)",
+                    data=db_file.read(),
+                    file_name=os.path.basename(DB_PATH),
+                    mime="application/x-sqlite3"
+                )
+                
     con = get_db()
     rows = con.execute(
         "SELECT username, role, first_login FROM users"
@@ -1303,9 +1319,6 @@ def create_user_view():
             st.error("Username, password, and phone number are required.")
             return
 
-        # DEBUG: Check database path
-        st.info(f"Database path: {os.path.abspath(DB_PATH)}")
-        st.info(f"Database exists: {os.path.exists(DB_PATH)}")
 
         ok, msg = create_user(
             username=u,
@@ -1318,29 +1331,7 @@ def create_user_view():
         if ok:
             st.success(msg)
             
-            # DEBUG: Verify user was created
-            st.write("---DEBUG INFO---")
-            con = get_db()
-            cur = con.cursor()
-            
-            # Check if user exists
-            check_user = cur.execute("SELECT * FROM users WHERE username=?", (u,)).fetchone()
-            st.write(f"User found in DB: {check_user is not None}")
-            if check_user:
-                st.write(f"User details: {check_user}")
-            
-            # Count all users
-            total_users = cur.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-            st.write(f"Total users in database: {total_users}")
-            
-            # List all usernames
-            all_users = cur.execute("SELECT username, role, phone FROM users").fetchall()
-            st.write("All users:")
-            for user_row in all_users:
-                st.write(f"  - {user_row}")
-            
-            con.close()
-            st.write("---END DEBUG---")
+           
         else:
             st.error(msg)
 
