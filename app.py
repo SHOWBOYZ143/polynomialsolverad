@@ -509,14 +509,6 @@ def create_user(username, pw, role, phone, email=None):
     return True, "User created successfully"
 
 
-# In create_user_view(), after the create_user() call:
-if ok:
-    st.success(msg)
-    # DEBUG: Check if user exists
-    test_con = sqlite3.connect(DB_PATH)
-    test_user = test_con.execute("SELECT * FROM users WHERE username=?", (u,)).fetchone()
-    st.write("DEBUG - User in DB:", test_user)
-    test_con.close()
 
 
 
