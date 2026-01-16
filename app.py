@@ -42,6 +42,22 @@ div[data-testid="metric-container"] {
 # ======================================================
 st.set_page_config(page_title="Polynomial Solver Portal", layout="wide")
 DEFAULT_DB_DIR = "/mount/data" if os.path.isdir("/mount/data") else "."
+
+def _pick_db_dir() -> str:
+    preferred = "/mount/data"
+    if os.path.isdir(preferred) and os.access(preferred, os.W_OK):
+        return preferred
+
+    cwd = os.getcwd()
+    if os.access(cwd, os.W_OK):
+        return cwd
+
+    fallback = "/tmp/polynomialsolverad"
+    os.makedirs(fallback, exist_ok=True)
+    return fallback
+
+
+DEFAULT_DB_DIR = _pick_db_dir()
 DB_PATH = os.environ.get(
     "POLY_DB_PATH",
     os.path.join(DEFAULT_DB_DIR, "polynomialsolver.db")
