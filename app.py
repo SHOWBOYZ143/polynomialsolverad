@@ -1033,21 +1033,63 @@ def view_users_view():
     st.subheader("All Users")
 
 
-    with st.expander("Database info"):
-        db_path = os.path.abspath(DB_PATH)
-        st.write(f"Database file: `{db_path}`")
-        db_exists = os.path.exists(DB_PATH)
-        st.write(f"Database exists: **{db_exists}**")
-        if db_exists:
-            db_size_kb = os.path.getsize(DB_PATH) / 1024
-            st.write(f"Database size: **{db_size_kb:.1f} KB**")
+     with st.expander("Database info"):
+        primary_path = os.path.abspath(DB_PATH)
+        st.write(f"Primary database file: `{primary_path}`")
+        primary_exists = os.path.exists(DB_PATH)
+        st.write(f"Primary database exists: **{primary_exists}**")
+        if primary_exists:
+            primary_size_kb = os.path.getsize(DB_PATH) / 1024
+            st.write(f"Primary database size: **{primary_size_kb:.1f} KB**")
             with open(DB_PATH, "rb") as db_file:
                 st.download_button(
-                    "Download database (SQLite)",
+                    "Download primary database (SQLite)",
                     data=db_file.read(),
                     file_name=os.path.basename(DB_PATH),
                     mime="application/x-sqlite3"
                 )
+
+        mirror_path = os.path.abspath(MIRROR_DB_PATH)
+        st.write(f"Mirror database file: `{mirror_path}`")
+        mirror_exists = os.path.exists(MIRROR_DB_PATH)
+        st.write(f"Mirror database exists: **{mirror_exists}**")
+        if not mirror_exists:
+            st.warning(
+                "Mirror database not found. Use the button below to create it "
+                "and sync current users."
+            )
+            if st.button("Create & sync mirror database"):
+                try:
+                    ensure_mirror_schema()
+                    sync_users_to_mirror()
+                    st.success("Mirror database created and synced.")
+                except (sqlite3.Error, OSError) as exc:
+                    st.error(f"Unable to create mirror database: {exc}")
+        if mirror_exists:
+            mirror_size_kb = os.path.getsize(MIRROR_DB_PATH) / 1024
+            st.write(f"Mirror database size: **{mirror_size_kb:.1f} KB**")
+            try:
+                mirror_con = get_mirror_db()
+                mirror_count = mirror_con.execute(
+                    "SELECT COUNT(*) FROM users_mirror"
+                ).fetchone()[0]
+                mirror_con.close()
+                st.write(f"Mirror users: **{mirror_count}**")
+            except sqlite3.Error:
+                st.write("Mirror users: **Unavailable**")
+
+            with open(MIRROR_DB_PATH, "rb") as mirror_file:
+                st.download_button(
+                    "Download mirror database (SQLite)",
+                    data=mirror_file.read(),
+                    file_name=os.path.basename(MIRROR_DB_PATH),
+                    mime="application/x-sqlite3"
+                )
+
+        if st.button("Sync users to mirror database"):
+            sync_users_to_mirror()
+            st.success("Mirror database synced with current users.")
+
                 
     con = get_db()
     rows = con.execute(
