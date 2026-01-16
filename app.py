@@ -42,6 +42,7 @@ div[data-testid="metric-container"] {
 # ======================================================
 st.set_page_config(page_title="Polynomial Solver Portal", layout="wide")
 DB_PATH = os.environ.get("POLY_DB_PATH", "polynomialsolver.db")
+MIRROR_DB_PATH = os.environ.get("POLY_MIRROR_DB_PATH", "dbforsql.db")
 
 # ======================================================
 # Time helpers
@@ -120,6 +121,30 @@ def get_db():
     con = sqlite3.connect(DB_PATH, timeout=30, check_same_thread=False)
     con.execute("PRAGMA journal_mode=WAL;")
     return con
+
+
+def get_mirror_db():
+    con = sqlite3.connect(MIRROR_DB_PATH, timeout=30, check_same_thread=False)
+    con.execute("PRAGMA journal_mode=WAL;")
+    return con
+
+
+def ensure_mirror_schema():
+    con = get_mirror_db()
+    cur = con.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users_mirror (
+            username TEXT PRIMARY KEY,
+            role TEXT DEFAULT 'user',
+            phone TEXT,
+            email TEXT,
+            first_login INTEGER DEFAULT 1,
+            created_at TEXT,
+            last_login TEXT
+        )
+    """)
+    con.commit()
+    con.close()
 
 
 def ensure_history_schema_v2():
@@ -273,7 +298,8 @@ def ensure_schema():
     ensure_users_schema_v2()   # phone, email
     ensure_users_schema_v3()   # recovery questions
     ensure_history_schema_v2()
-
+    ensure_mirror_schema()
+    
     # ------------------------
     # Default admin user
     # ------------------------
@@ -466,6 +492,43 @@ def migrate_plaintext_passwords():
     con.commit()
     con.close()
 
+
+def upsert_mirror_user(username, role, phone, email, first_login, created_at, last_login):
+    con = get_mirror_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        INSERT INTO users_mirror (
+            username,
+            role,
+            phone,
+            email,
+            first_login,
+            created_at,
+            last_login
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(username) DO UPDATE SET
+            role=excluded.role,
+            phone=excluded.phone,
+            email=excluded.email,
+            first_login=excluded.first_login,
+            created_at=excluded.created_at,
+            last_login=excluded.last_login
+        """,
+        (username, role, phone, email, first_login, created_at, last_login)
+    )
+    con.commit()
+    con.close()
+
+
+def delete_mirror_user(username):
+    con = get_mirror_db()
+    con.execute("DELETE FROM users_mirror WHERE username=?", (username,))
+    con.commit()
+    con.close()
+
+
 def create_user(username, pw, role, phone, email=None):
     con = get_db()
     cur = con.cursor()
@@ -477,6 +540,8 @@ def create_user(username, pw, role, phone, email=None):
     if cur.fetchone():
         con.close()
         return False, "User already exists"
+
+    created_at = now_iso()
 
     cur.execute(
         """
@@ -499,11 +564,26 @@ def create_user(username, pw, role, phone, email=None):
             phone,
             email,
             1,
-            now_iso(),
+            created_at,
             None
         )
     )
+    try:
+        upsert_mirror_user(
+            username=username,
+            role=role,
+            phone=phone,
+            email=email,
+            first_login=1,
+            created_at=created_at,
+            last_login=None
+        )
+    except sqlite3.Error as exc:
+        con.rollback()
+        con.close()
+        return False, f"User not created (mirror DB error: {exc})."
 
+    
     con.commit()
     con.close()
     return True, "User created successfully"
@@ -526,6 +606,7 @@ def delete_user(username):
     con.execute("DELETE FROM users WHERE username=?", (username,))
     con.commit()
     con.close()
+    delete_mirror_user(username)
     return True, "User deleted"
 
 def back_to_solver():
