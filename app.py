@@ -147,6 +147,27 @@ def ensure_mirror_schema():
     con.close()
 
 
+def sync_users_to_mirror():
+    try:
+        con = get_db()
+        cur = con.cursor()
+        rows = cur.execute(
+            """
+            SELECT username, role, phone, email, first_login, created_at, last_login
+            FROM users
+            """
+        ).fetchall()
+        con.close()
+    except sqlite3.Error:
+        return
+
+    try:
+        for row in rows:
+            upsert_mirror_user(*row)
+    except sqlite3.Error:
+        return
+
+
 def ensure_history_schema_v2():
     """
     Ensures history table has the columns we need for:
@@ -328,8 +349,7 @@ def ensure_schema():
     con.close()
 
     migrate_plaintext_passwords()
-
-
+    ensure_mirror_schema()
 
 def ensure_history_schema():
     con = get_db()
