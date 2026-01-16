@@ -49,6 +49,7 @@ DB_PATH = os.environ.get(
 MIRROR_DB_PATH = os.environ.get(
     "POLY_MIRROR_DB_PATH",
     os.path.join(DEFAULT_DB_DIR, "dbforsql.db")
+)
 
 # ======================================================
 # Time helpers
