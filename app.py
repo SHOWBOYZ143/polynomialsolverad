@@ -66,6 +66,10 @@ MIRROR_DB_PATH = os.environ.get(
     "POLY_MIRROR_DB_PATH",
     os.path.join(DEFAULT_DB_DIR, "dbforsql.db")
 )
+for _path in (DB_PATH, MIRROR_DB_PATH):
+    _dir = os.path.dirname(_path)
+    if _dir:
+        os.makedirs(_dir, exist_ok=True)
 
 # ======================================================
 # Time helpers
