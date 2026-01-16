@@ -951,7 +951,8 @@ def solver_view():
 def view_users_view():
     st.subheader("All Users")
 
-     with st.expander("Database info"):
+
+    with st.expander("Database info"):
         db_path = os.path.abspath(DB_PATH)
         st.write(f"Database file: `{db_path}`")
         db_exists = os.path.exists(DB_PATH)
