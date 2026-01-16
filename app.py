@@ -1033,7 +1033,7 @@ def view_users_view():
     st.subheader("All Users")
 
 
-     with st.expander("Database info"):
+    with st.expander("Database info"):
         primary_path = os.path.abspath(DB_PATH)
         st.write(f"Primary database file: `{primary_path}`")
         primary_exists = os.path.exists(DB_PATH)
