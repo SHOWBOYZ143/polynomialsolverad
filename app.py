@@ -1354,6 +1354,10 @@ def create_user_view():
             st.error("Username, password, and phone number are required.")
             return
 
+        # DEBUG: Check database path
+        st.info(f"Database path: {os.path.abspath(DB_PATH)}")
+        st.info(f"Database exists: {os.path.exists(DB_PATH)}")
+
         ok, msg = create_user(
             username=u,
             pw=p,
@@ -1364,9 +1368,32 @@ def create_user_view():
 
         if ok:
             st.success(msg)
+            
+            # DEBUG: Verify user was created
+            st.write("---DEBUG INFO---")
+            con = get_db()
+            cur = con.cursor()
+            
+            # Check if user exists
+            check_user = cur.execute("SELECT * FROM users WHERE username=?", (u,)).fetchone()
+            st.write(f"User found in DB: {check_user is not None}")
+            if check_user:
+                st.write(f"User details: {check_user}")
+            
+            # Count all users
+            total_users = cur.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+            st.write(f"Total users in database: {total_users}")
+            
+            # List all usernames
+            all_users = cur.execute("SELECT username, role, phone FROM users").fetchall()
+            st.write("All users:")
+            for user_row in all_users:
+                st.write(f"  - {user_row}")
+            
+            con.close()
+            st.write("---END DEBUG---")
         else:
             st.error(msg)
-
 
 
 
