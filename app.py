@@ -41,7 +41,7 @@ div[data-testid="metric-container"] {
 # App config
 # ======================================================
 st.set_page_config(page_title="Polynomial Solver Portal", layout="wide")
-DB_PATH = "polynomialsolver.db"
+DB_PATH = os.environ.get("POLY_DB_PATH", "polynomialsolver.db")
 
 # ======================================================
 # Time helpers
@@ -669,49 +669,6 @@ def forced_password_change():
         st.session_state.first_login = 0
         st.success("Password updated")
         st.rerun()
-def user_stats_view():
-    st.subheader("My Statistics")
-
-    con = get_db()
-
-    total_solves = con.execute(
-        "SELECT COUNT(*) FROM history WHERE username=?",
-        (st.session_state.username,)
-    ).fetchone()[0]
-
-    last_solve = con.execute(
-        "SELECT MAX(created_at) FROM history WHERE username=?",
-        (st.session_state.username,)
-    ).fetchone()[0]
-
-    last_login = con.execute(
-        "SELECT last_login FROM users WHERE username=?",
-        (st.session_state.username,)
-    ).fetchone()[0]
-
-    con.close()
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(
-            label="Total Solves",
-            value=total_solves
-        )
-
-    with col2:
-        st.metric(
-            label="Last Solve",
-            value=human_time(last_solve)
-        )
-
-
-    st.markdown(
-        "<div style='margin-top:12px; margin-bottom:24px; border-bottom:1px solid #2a2d3a;'></div>",
-        unsafe_allow_html=True
-    )
-
-
 
 def solver_view():
     st.subheader("Polynomial Solver")
