@@ -2,14 +2,29 @@ import os
 import sqlite3
 from pathlib import Path
 import psycopg2
+import re
 
 DB_PATH = Path(os.environ.get("POLY_DB_PATH", "polynomialsolver.db"))
 DB_URL = os.environ.get("POLY_DATABASE_URL") or os.environ.get("DATABASE_URL")
 USE_POSTGRES = bool(DB_URL)
 
 
+DB_URL = os.environ.get("POLY_DATABASE_URL") or os.environ.get("DATABASE_URL")
+USE_POSTGRES = bool(DB_URL)
+PRAGMA_TABLE_INFO_RE = re.compile(r"PRAGMA\\s+table_info\\((?P<table>[^)]+)\\)", re.IGNORECASE)
+
+
 def _convert_sql(sql: str) -> str:
     if USE_POSTGRES:
+        pragma_match = PRAGMA_TABLE_INFO_RE.search(sql)
+        if pragma_match:
+            table = pragma_match.group("table").strip().strip('"').strip("'")
+            return (
+                "SELECT ordinal_position AS cid, column_name AS name "
+                "FROM information_schema.columns "
+                "WHERE table_schema='public' AND table_name='{}' "
+                "ORDER BY ordinal_position"
+            ).format(table)
         return sql.replace("?", "%s")
     return sql
 
@@ -51,7 +66,6 @@ class ConnectionAdapter:
     def close(self):
         self._conn.close()
 
-
 def get_connection():
     if USE_POSTGRES:
         return ConnectionAdapter(psycopg2.connect(DB_URL))
@@ -78,6 +92,9 @@ def _table_columns(cur, table):
 
 def _add_column(cur, table, column, definition):
     cols = _table_columns(cur, table)
+
+
+
   
     if column not in cols:
         cur.execute(f"ALTER TABLE {table} ADD COLUMN {definition}")
