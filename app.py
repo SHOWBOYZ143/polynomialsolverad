@@ -849,15 +849,19 @@ def login_view():
         st.session_state.login_fails = 0
 
     # ---------- Login form (Enter submits) ----------
-    with st.form("login_form", clear_on_submit=False):
-        u = st.text_input("Username", key="login_user").strip()
-        p = st.text_input("Password", type="password", key="login_pass")
-        login_clicked = st.form_submit_button("Login")
+   left, center, right = st.columns([1, 2, 1])
+    with center:
+        with st.container(border=True):
+            with st.form("login_form", clear_on_submit=False):
+                u = st.text_input("Username", key="login_user").strip()
+                p = st.text_input("Password", type="password", key="login_pass")
+                login_clicked = st.form_submit_button("Login")
 
-    # ---------- Forgot password (separate button) ----------
-    if st.button("Forgot password?", key="forgot_btn"):
-        st.session_state.page = "recover"
-        st.rerun()
+            forgot_col, _ = st.columns([1, 1])
+            with forgot_col:
+                if st.button("Forgot password?", key="forgot_btn"):
+                    st.session_state.page = "recover"
+                    st.rerun()
 
     # ---------- Handle login ----------
     if not login_clicked:
