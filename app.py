@@ -212,12 +212,6 @@ def get_db():
     return ConnectionAdapter(con)
 
 
-def get_mirror_db():
-    con = sqlite3.connect(MIRROR_DB_PATH, timeout=30, check_same_thread=False)
-    con.execute("PRAGMA journal_mode=WAL;")
-    return ConnectionAdapter(con)
-
-
 def _table_exists(cur, table_name):
     if USE_POSTGRES:
         cur.execute("SELECT to_regclass(%s)", (table_name,))
@@ -1302,14 +1296,12 @@ def admin_stats_view():
     # ---------- Time parsing ----------
     cutoff = datetime.now() - timedelta(days=inactivity_days)
 
-    def parse_ts(ts):
-        return datetime.fromisoformat(ts) if ts else None
-
-    df["last_login_dt"] = df["last_login"].apply(parse_ts)
-    df["last_solve_dt"] = df["last_solve"].apply(parse_ts)
+    df["last_login_dt"] = pd.to_datetime(df["last_login"], errors="coerce")
+    df["last_solve_dt"] = pd.to_datetime(df["last_solve"], errors="coerce")
 
     # ---------- Last activity ----------
-    df["last_activity"] = df[["last_login_dt", "last_solve_dt"]].max(axis=1)
+    df["last_activity"] = df[["last_login_dt", "last_solve_dt"]].max(axis=1, skipna=True)
+
 
     # ---------- Active / Inactive ----------
     df["Inactive"] = df["last_activity"].apply(
