@@ -379,7 +379,7 @@ def ensure_users_schema_v3():
     con = get_db()
     cur = con.cursor()
 
-   cols = _table_columns(cur, "users")
+    cols = _table_columns(cur, "users")
 
     if "recovery_q1" not in cols:
         cur.execute("ALTER TABLE users ADD COLUMN recovery_q1 TEXT")
