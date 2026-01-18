@@ -24,9 +24,9 @@ def seed_admin():
     cur.execute("SELECT 1 FROM users WHERE username='ad'")
     exists = cur.fetchone() is not None
 
-     if not exists:
+    if not exists:
         cur.execute(
-             """
+            """
             INSERT INTO users (
                 username,
                 password,
