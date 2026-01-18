@@ -1874,7 +1874,7 @@ st.session_state.setdefault("show_history", False)
 if not st.session_state.logged_in:
     if st.session_state.page == "recover":
         password_recovery_view()
-        elif st.session_state.page == "signup":
+    elif st.session_state.page == "signup":
         signup_view()
     else:
         login_view()
