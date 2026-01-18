@@ -320,7 +320,7 @@ def ensure_history_schema_v2():
         return
 
     # Inspect existing columns
-    cur.execute("PRAGMA table_info(history)")
+    
     cols = _table_columns(cur, "history")
 
     # If username column is missing, we rebuild table safely
