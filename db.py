@@ -49,6 +49,7 @@ class CursorAdapter:
 
 
 class ConnectionAdapter:
+    
     def __init__(self, conn):
         self._conn = conn
 
