@@ -1,18 +1,84 @@
 import os
 import sqlite3
 from pathlib import Path
+import psycopg2
 
 DB_PATH = Path(os.environ.get("POLY_DB_PATH", "polynomialsolver.db"))
+DB_URL = os.environ.get("POLY_DATABASE_URL") or os.environ.get("DATABASE_URL")
+USE_POSTGRES = bool(DB_URL)
+
+
+def _convert_sql(sql: str) -> str:
+    if USE_POSTGRES:
+        return sql.replace("?", "%s")
+    return sql
+
+
+class CursorAdapter:
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    def execute(self, sql, params=None):
+        sql = _convert_sql(sql)
+        if params is None:
+            self._cursor.execute(sql)
+        else:
+            self._cursor.execute(sql, params)
+        return self
+
+    def fetchone(self):
+        return self._cursor.fetchone()
+
+    def fetchall(self):
+        return self._cursor.fetchall()
+
+
+class ConnectionAdapter:
+    def __init__(self, conn):
+        self._conn = conn
+
+    def cursor(self):
+        return CursorAdapter(self._conn.cursor())
+
+    def execute(self, sql, params=None):
+        cur = self.cursor()
+        cur.execute(sql, params)
+        return cur
+
+    def commit(self):
+        self._conn.commit()
+
+    def close(self):
+        self._conn.close()
 
 
 def get_connection():
+    if USE_POSTGRES:
+        return ConnectionAdapter(psycopg2.connect(DB_URL))
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
-    return conn
+    return ConnectionAdapter(conn)
+
+
+def _table_columns(cur, table):
+    if USE_POSTGRES:
+        cur.execute(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema='public' AND table_name=%s
+            """,
+            (table,)
+        )
+        return {row[0] for row in cur.fetchall()}
+
+    cur.execute(f"PRAGMA table_info({table})")
+    return {row[1] for row in cur.fetchall()}
+
 
 def _add_column(cur, table, column, definition):
-    cur.execute(f"PRAGMA table_info({table})")
-    cols = {row[1] for row in cur.fetchall()}
+    cols = _table_columns(cur, table)
+  
     if column not in cols:
         cur.execute(f"ALTER TABLE {table} ADD COLUMN {definition}")
 
