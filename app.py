@@ -1194,37 +1194,37 @@ def view_users_view():
                     "Mirror database not found. Use the button below to create it "
                     "and sync current users."
                 )
- if st.button("Create & sync mirror database"):
-                    try:
-                        ensure_mirror_schema()
-                        sync_users_to_mirror()
-                        st.success("Mirror database created and synced.")
-                    except (sqlite3.Error, OSError) as exc:
-                        st.error(f"Unable to create mirror database: {exc}")
-            if mirror_exists:
-                mirror_size_kb = os.path.getsize(MIRROR_DB_PATH) / 1024
-                st.write(f"Mirror database size: **{mirror_size_kb:.1f} KB**")
+        if st.button("Create & sync mirror database"):
                 try:
-                    mirror_con = get_mirror_db()
-                    mirror_count = mirror_con.execute(
-                        "SELECT COUNT(*) FROM users_mirror"
-                    ).fetchone()[0]
-                    mirror_con.close()
-                    st.write(f"Mirror users: **{mirror_count}**")
-                except sqlite3.Error:
-                    st.write("Mirror users: **Unavailable**")
+                    ensure_mirror_schema()
+                    sync_users_to_mirror()
+                    st.success("Mirror database created and synced.")
+                except (sqlite3.Error, OSError) as exc:
+                    st.error(f"Unable to create mirror database: {exc}")
+        if mirror_exists:
+            mirror_size_kb = os.path.getsize(MIRROR_DB_PATH) / 1024
+            st.write(f"Mirror database size: **{mirror_size_kb:.1f} KB**")
+            try:
+                mirror_con = get_mirror_db()
+                mirror_count = mirror_con.execute(
+                    "SELECT COUNT(*) FROM users_mirror"
+                ).fetchone()[0]
+                mirror_con.close()
+                st.write(f"Mirror users: **{mirror_count}**")
+            except sqlite3.Error:
+                st.write("Mirror users: **Unavailable**")
 
-                with open(MIRROR_DB_PATH, "rb") as mirror_file:
-                    st.download_button(
-                        "Download mirror database (SQLite)",
-                        data=mirror_file.read(),
-                        file_name=os.path.basename(MIRROR_DB_PATH),
-                        mime="application/x-sqlite3"
-                    )
+            with open(MIRROR_DB_PATH, "rb") as mirror_file:
+                st.download_button(
+                    "Download mirror database (SQLite)",
+                    data=mirror_file.read(),
+                    file_name=os.path.basename(MIRROR_DB_PATH),
+                    mime="application/x-sqlite3"
+                )
 
-            if st.button("Sync users to mirror database"):
-                sync_users_to_mirror()
-                st.success("Mirror database synced with current users.")
+        if st.button("Sync users to mirror database"):
+            sync_users_to_mirror()
+            st.success("Mirror database synced with current users.")
     con = get_db()
     rows = con.execute(
         "SELECT username, role, first_login FROM users"
