@@ -1602,6 +1602,48 @@ def password_recovery_view():
             st.rerun()
 
 
+def signup_view():
+    st.subheader("Create an account")
+
+    with st.form("signup_form"):
+        u = st.text_input("Username", key="signup_user").strip()
+        p = st.text_input("Password", type="password", key="signup_pass")
+        phone = st.text_input("Phone number (required)", key="signup_phone")
+        email = st.text_input("Email (optional)", key="signup_email")
+        submitted = st.form_submit_button("Create account")
+
+    if st.button("Back to login", key="signup_back"):
+        st.session_state.page = "login"
+        st.rerun()
+
+    if not submitted:
+        return
+
+    if not u or not p or not phone:
+        st.error("Username, password, and phone number are required.")
+        return
+
+    ok, msg = validate_password_strength(p)
+    if not ok:
+        st.error(msg)
+        return
+
+    ok, msg = create_user(
+        username=u,
+        pw=p,
+        role="user",
+        phone=phone,
+        email=email if email else None
+    )
+
+    if ok:
+        st.success("Account created successfully. Please log in.")
+        st.session_state.page = "login"
+        st.rerun()
+    else:
+        st.error(msg)
+
+
    
 
 def create_user_view():
@@ -1828,6 +1870,8 @@ st.session_state.setdefault("show_history", False)
 if not st.session_state.logged_in:
     if st.session_state.page == "recover":
         password_recovery_view()
+        elif st.session_state.page == "signup":
+        signup_view()
     else:
         login_view()
 
