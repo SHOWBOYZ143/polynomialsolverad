@@ -35,6 +35,15 @@ div[data-testid="metric-container"] {
     padding: 16px;
     border-radius: 10px;
 }
+div[data-testid="stSelectbox"],
+div[data-testid="stTextInput"] {
+    max-width: 480px;
+}
+
+div[data-testid="stSelectbox"] > div,
+div[data-testid="stTextInput"] input {
+    width: 100%;
+}
 </style>
 """, unsafe_allow_html=True)
     
