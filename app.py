@@ -881,6 +881,10 @@ def login_view():
                     st.session_state.page = "recover"
                     st.rerun()
 
+            if st.button("Create account", key="signup_btn"):
+                st.session_state.page = "signup"
+                st.rerun()
+
     # ---------- Handle login ----------
     if not login_clicked:
         return
