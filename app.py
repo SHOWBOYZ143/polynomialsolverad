@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 import psycopg2
+import re
 
 import csv
 from datetime import datetime
