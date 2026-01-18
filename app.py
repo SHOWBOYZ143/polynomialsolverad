@@ -8,6 +8,7 @@ import base64
 import numpy as np
 import matplotlib.pyplot as plt
 import io
+import psycopg2
 
 import csv
 from datetime import datetime
@@ -41,7 +42,7 @@ div[data-testid="metric-container"] {
 # App config
 # ======================================================
 st.set_page_config(page_title="Polynomial Solver Portal", layout="wide")
-DEFAULT_DB_DIR = "/mount/data" if os.path.isdir("/mount/data") else "."
+
 
 def _pick_db_dir() -> str:
     preferred = "/mount/data"
@@ -58,6 +59,9 @@ def _pick_db_dir() -> str:
 
 
 DEFAULT_DB_DIR = _pick_db_dir()
+DB_URL = os.environ.get("POLY_DATABASE_URL") or os.environ.get("DATABASE_URL")
+USE_POSTGRES = bool(DB_URL)
+
 DB_PATH = os.environ.get(
     "POLY_DB_PATH",
     os.path.join(DEFAULT_DB_DIR, "polynomialsolver.db")
@@ -71,6 +75,60 @@ for _path in (DB_PATH, MIRROR_DB_PATH):
     if _dir:
         os.makedirs(_dir, exist_ok=True)
 
+DB_ERRORS = (sqlite3.Error, psycopg2.Error)
+
+
+def _convert_sql(sql: str) -> str:
+    if USE_POSTGRES:
+        return sql.replace("?", "%s")
+    return sql
+
+
+class CursorAdapter:
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    def execute(self, sql, params=None):
+        sql = _convert_sql(sql)
+        if params is None:
+            self._cursor.execute(sql)
+        else:
+            self._cursor.execute(sql, params)
+        return self
+
+    def executemany(self, sql, seq):
+        sql = _convert_sql(sql)
+        self._cursor.executemany(sql, seq)
+        return self
+
+    def fetchone(self):
+        return self._cursor.fetchone()
+
+    def fetchall(self):
+        return self._cursor.fetchall()
+
+
+class ConnectionAdapter:
+    def __init__(self, conn):
+        self._conn = conn
+
+    def cursor(self):
+        return CursorAdapter(self._conn.cursor())
+
+    def execute(self, sql, params=None):
+        cur = self.cursor()
+        cur.execute(sql, params)
+        return cur
+
+    def commit(self):
+        self._conn.commit()
+
+    def rollback(self):
+        self._conn.rollback()
+
+    def close(self):
+        self._conn.close()
+        
 # ======================================================
 # Time helpers
 # ======================================================
@@ -145,16 +203,50 @@ def user_stats_view():
 
  
 def get_db():
+    if USE_POSTGRES:
+        return ConnectionAdapter(psycopg2.connect(DB_URL))
+        
     con = sqlite3.connect(DB_PATH, timeout=30, check_same_thread=False)
     con.execute("PRAGMA journal_mode=WAL;")
-    return con
+    return ConnectionAdapter(con)
 
 
 def get_mirror_db():
     con = sqlite3.connect(MIRROR_DB_PATH, timeout=30, check_same_thread=False)
     con.execute("PRAGMA journal_mode=WAL;")
-    return con
+    return ConnectionAdapter(con)
 
+
+def _table_exists(cur, table_name):
+    if USE_POSTGRES:
+        cur.execute("SELECT to_regclass(%s)", (table_name,))
+        return cur.fetchone()[0] is not None
+
+    cur.execute("""
+        SELECT name FROM sqlite_master
+        WHERE type='table' AND name=?
+    """, (table_name,))
+    return cur.fetchone() is not None
+
+
+def _table_columns(cur, table_name):
+    if USE_POSTGRES:
+        cur.execute("""
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema='public' AND table_name=%s
+        """, (table_name,))
+        return [row[0] for row in cur.fetchall()]
+
+    cur.execute(f"PRAGMA table_info({table_name})")
+    return [row[1] for row in cur.fetchall()]
+
+
+def _history_id_definition():
+    if USE_POSTGRES:
+        return "SERIAL PRIMARY KEY"
+    return "INTEGER PRIMARY KEY AUTOINCREMENT"
+    
 
 def ensure_mirror_schema():
     con = get_mirror_db()
@@ -185,13 +277,13 @@ def sync_users_to_mirror():
             """
         ).fetchall()
         con.close()
-    except sqlite3.Error:
+    except DB_ERRORS:
         return
 
     try:
         for row in rows:
             upsert_mirror_user(*row)
-    except sqlite3.Error:
+    except DB_ERRORS:
         return
 
 
@@ -207,18 +299,13 @@ def ensure_history_schema_v2():
     con = get_db()
     cur = con.cursor()
 
-    # Does history exist?
-    cur.execute("""
-        SELECT name FROM sqlite_master
-        WHERE type='table' AND name='history'
-    """)
-    exists = cur.fetchone() is not None
+    exists = _table_exists(cur, "history")
 
     if not exists:
         # Fresh create (correct structure)
         cur.execute("""
             CREATE TABLE IF NOT EXISTS history (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id {id_def},
                 username TEXT NOT NULL,
                 coeffs TEXT NOT NULL,
                 roots TEXT NOT NULL,
@@ -226,14 +313,14 @@ def ensure_history_schema_v2():
                 calc_name TEXT,
                 version INTEGER DEFAULT 1
             )
-        """)
+        """.format(id_def=_history_id_definition()))
         con.commit()
         con.close()
         return
 
     # Inspect existing columns
     cur.execute("PRAGMA table_info(history)")
-    cols = [r[1] for r in cur.fetchall()]
+    cols = _table_columns(cur, "history")
 
     # If username column is missing, we rebuild table safely
     if "username" not in cols:
@@ -243,7 +330,7 @@ def ensure_history_schema_v2():
 
         cur.execute("""
             CREATE TABLE history (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id {id_def},
                 username TEXT NOT NULL,
                 coeffs TEXT NOT NULL,
                 roots TEXT NOT NULL,
@@ -251,7 +338,7 @@ def ensure_history_schema_v2():
                 calc_name TEXT,
                 version INTEGER DEFAULT 1
             )
-        """)
+       """.format(id_def=_history_id_definition()))
 
         # Migrate old rows. Old table had no username, we tag them as "unknown".
         cur.execute("""
@@ -278,9 +365,7 @@ def ensure_users_schema_v2():
     con = get_db()
     cur = con.cursor()
 
-    cur.execute("PRAGMA table_info(users)")
-    cols = [r[1] for r in cur.fetchall()]
-
+    cols = _table_columns(cur, "users")
     if "phone" not in cols:
         cur.execute("ALTER TABLE users ADD COLUMN phone TEXT")
 
@@ -294,8 +379,7 @@ def ensure_users_schema_v3():
     con = get_db()
     cur = con.cursor()
 
-    cur.execute("PRAGMA table_info(users)")
-    cols = [r[1] for r in cur.fetchall()]
+   cols = _table_columns(cur, "users")
 
     if "recovery_q1" not in cols:
         cur.execute("ALTER TABLE users ADD COLUMN recovery_q1 TEXT")
@@ -625,7 +709,7 @@ def create_user(username, pw, role, phone, email=None):
             created_at=created_at,
             last_login=None
         )
-    except sqlite3.Error as exc:
+    except DB_ERRORS as exc:
         con.rollback()
         con.close()
         return False, f"User not created (mirror DB error: {exc})."
