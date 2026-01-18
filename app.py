@@ -601,6 +601,20 @@ def hash_answer(answer: str) -> str:
 
 
 
+
+def validate_password_strength(password: str) -> tuple[bool, str]:
+    if len(password) < 5:
+        return False, "Password must be at least 5 characters long."
+    if not any(char.islower() for char in password):
+        return False, "Password must include at least one lowercase letter."
+    if not any(char.isupper() for char in password):
+        return False, "Password must include at least one uppercase letter."
+    if not any(not char.isalnum() for char in password):
+        return False, "Password must include at least one special character."
+    return True, ""
+
+
+
 def verify_password(password: str, stored: str) -> bool:
     # stored format: "salt_b64:hash_b64"
     try:
@@ -613,6 +627,9 @@ def verify_password(password: str, stored: str) -> bool:
         return False
 
 def update_password(username, pw):
+     ok, msg = validate_password_strength(pw)
+     if not ok:
+        return False, msg
     con = get_db()
     con.execute(
         "UPDATE users SET password=?, first_login=0 WHERE username=?",
@@ -620,6 +637,7 @@ def update_password(username, pw):
     )
     con.commit()
     con.close()
+    return True, ""
 
 
 def migrate_plaintext_passwords():
@@ -899,10 +917,14 @@ def forced_password_change():
     p1 = st.text_input("New password", type="password")
     p2 = st.text_input("Confirm password", type="password")
     if st.button("Save"):
-        if p1 != p2 or len(p1) < 4:
-            st.error("Passwords invalid")
+        if p1 != p2:
+            st.error("Passwords do not match.")
             return
-        update_password(st.session_state.username, p1)
+        ok, msg = update_password(st.session_state.username, p1)
+        if not ok:
+            st.error(msg)
+            return
+        
         st.session_state.first_login = 0
         st.success("Password updated")
         st.rerun()
@@ -1566,14 +1588,10 @@ def password_recovery_view():
         elif new_pw != confirm_pw:
             st.error("Passwords do not match.")
         else:
-            con = get_db()
-            cur = con.cursor()
-            cur.execute(
-                "UPDATE users SET password=? WHERE username=?",
-                (hash_password(new_pw), st.session_state.reset_user)
-            )
-            con.commit()
-            con.close()
+            ok, msg = update_password(st.session_state.reset_user, new_pw)
+            if not ok:
+                st.error(msg)
+                return
 
             st.success("Password reset successful. You can now log in.")
 
@@ -1599,6 +1617,11 @@ def create_user_view():
     if st.button("Create user"):
         if not u or not p or not phone:
             st.error("Username, password, and phone number are required.")
+            return
+
+        ok, msg = validate_password_strength(p)
+        if not ok:
+            st.error(msg)
             return
 
 
