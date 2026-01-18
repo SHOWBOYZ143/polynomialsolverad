@@ -620,6 +620,8 @@ def migrate_plaintext_passwords():
 
 
 def upsert_mirror_user(username, role, phone, email, first_login, created_at, last_login):
+    if USE_POSTGRES:
+        return
     con = get_mirror_db()
     cur = con.cursor()
     cur.execute(
@@ -649,6 +651,8 @@ def upsert_mirror_user(username, role, phone, email, first_login, created_at, la
 
 
 def delete_mirror_user(username):
+    if USE_POSTGRES:
+        return
     con = get_mirror_db()
     con.execute("DELETE FROM users_mirror WHERE username=?", (username,))
     con.commit()
@@ -1160,6 +1164,11 @@ def view_users_view():
 
 
     with st.expander("Database info"):
+        if USE_POSTGRES:
+            st.info("Mirror database is disabled when using PostgreSQL.")
+            mirror_enabled = False
+        else:
+            mirror_enabled = True
         primary_path = os.path.abspath(DB_PATH)
         st.write(f"Primary database file: `{primary_path}`")
         primary_exists = os.path.exists(DB_PATH)
@@ -1175,48 +1184,47 @@ def view_users_view():
                     mime="application/x-sqlite3"
                 )
 
-        mirror_path = os.path.abspath(MIRROR_DB_PATH)
-        st.write(f"Mirror database file: `{mirror_path}`")
-        mirror_exists = os.path.exists(MIRROR_DB_PATH)
-        st.write(f"Mirror database exists: **{mirror_exists}**")
-        if not mirror_exists:
-            st.warning(
-                "Mirror database not found. Use the button below to create it "
-                "and sync current users."
-            )
-            if st.button("Create & sync mirror database"):
-                try:
-                    ensure_mirror_schema()
-                    sync_users_to_mirror()
-                    st.success("Mirror database created and synced.")
-                except (sqlite3.Error, OSError) as exc:
-                    st.error(f"Unable to create mirror database: {exc}")
-        if mirror_exists:
-            mirror_size_kb = os.path.getsize(MIRROR_DB_PATH) / 1024
-            st.write(f"Mirror database size: **{mirror_size_kb:.1f} KB**")
-            try:
-                mirror_con = get_mirror_db()
-                mirror_count = mirror_con.execute(
-                    "SELECT COUNT(*) FROM users_mirror"
-                ).fetchone()[0]
-                mirror_con.close()
-                st.write(f"Mirror users: **{mirror_count}**")
-            except sqlite3.Error:
-                st.write("Mirror users: **Unavailable**")
-
-            with open(MIRROR_DB_PATH, "rb") as mirror_file:
-                st.download_button(
-                    "Download mirror database (SQLite)",
-                    data=mirror_file.read(),
-                    file_name=os.path.basename(MIRROR_DB_PATH),
-                    mime="application/x-sqlite3"
+        if mirror_enabled:
+            mirror_path = os.path.abspath(MIRROR_DB_PATH)
+            st.write(f"Mirror database file: `{mirror_path}`")
+            mirror_exists = os.path.exists(MIRROR_DB_PATH)
+            st.write(f"Mirror database exists: **{mirror_exists}**")
+            if not mirror_exists:
+                st.warning(
+                    "Mirror database not found. Use the button below to create it "
+                    "and sync current users."
                 )
+ if st.button("Create & sync mirror database"):
+                    try:
+                        ensure_mirror_schema()
+                        sync_users_to_mirror()
+                        st.success("Mirror database created and synced.")
+                    except (sqlite3.Error, OSError) as exc:
+                        st.error(f"Unable to create mirror database: {exc}")
+            if mirror_exists:
+                mirror_size_kb = os.path.getsize(MIRROR_DB_PATH) / 1024
+                st.write(f"Mirror database size: **{mirror_size_kb:.1f} KB**")
+                try:
+                    mirror_con = get_mirror_db()
+                    mirror_count = mirror_con.execute(
+                        "SELECT COUNT(*) FROM users_mirror"
+                    ).fetchone()[0]
+                    mirror_con.close()
+                    st.write(f"Mirror users: **{mirror_count}**")
+                except sqlite3.Error:
+                    st.write("Mirror users: **Unavailable**")
 
-        if st.button("Sync users to mirror database"):
-            sync_users_to_mirror()
-            st.success("Mirror database synced with current users.")
+                with open(MIRROR_DB_PATH, "rb") as mirror_file:
+                    st.download_button(
+                        "Download mirror database (SQLite)",
+                        data=mirror_file.read(),
+                        file_name=os.path.basename(MIRROR_DB_PATH),
+                        mime="application/x-sqlite3"
+                    )
 
-                
+            if st.button("Sync users to mirror database"):
+                sync_users_to_mirror()
+                st.success("Mirror database synced with current users.")
     con = get_db()
     rows = con.execute(
         "SELECT username, role, first_login FROM users"
