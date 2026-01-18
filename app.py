@@ -627,10 +627,10 @@ def verify_password(password: str, stored: str) -> bool:
         return False
 
 def update_password(username, pw):
-     ok, msg = validate_password_strength(pw)
+    ok, msg = validate_password_strength(pw)
      if not ok:
         return False, msg
-     con = get_db()
+    con = get_db()
     con.execute(
         "UPDATE users SET password=?, first_login=0 WHERE username=?",
         (hash_password(pw), username)
