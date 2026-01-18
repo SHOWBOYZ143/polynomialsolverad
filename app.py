@@ -835,7 +835,7 @@ def logout():
 # ======================================================
 
 def login_view():
-     st.markdown("<h1 style=\"text-align: center;\">Polynomial Solver Portal</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=\"text-align: center;\">Polynomial Solver Portal</h1>", unsafe_allow_html=True)
 
     # ---------- Lockout handling ----------
     st.session_state.setdefault("login_fails", 0)
