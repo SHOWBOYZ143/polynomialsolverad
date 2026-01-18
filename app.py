@@ -324,7 +324,7 @@ def ensure_history_schema_v2():
     cols = _table_columns(cur, "history")
 
     # If username column is missing, we rebuild table safely
-    if "username" not in cols:
+    if "username" not in cols: 
         cur.execute("""
             ALTER TABLE history RENAME TO history_old
         """)
