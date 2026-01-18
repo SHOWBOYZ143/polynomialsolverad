@@ -339,7 +339,7 @@ def ensure_history_schema_v2():
                 calc_name TEXT,
                 version INTEGER DEFAULT 1
             )
-       """.format(id_def=_history_id_definition()))
+         """.format(id_def=_history_id_definition()))
 
         # Migrate old rows. Old table had no username, we tag them as "unknown".
         cur.execute("""
