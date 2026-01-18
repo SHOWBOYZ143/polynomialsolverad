@@ -849,7 +849,7 @@ def login_view():
         st.session_state.login_fails = 0
 
     # ---------- Login form (Enter submits) ----------
-   left, center, right = st.columns([1, 2, 1])
+    left, center, right = st.columns([1, 2, 1])
     with center:
         with st.container(border=True):
             with st.form("login_form", clear_on_submit=False):
