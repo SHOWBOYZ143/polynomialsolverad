@@ -29,12 +29,61 @@ if "page" not in st.session_state:
 
 st.markdown("""
 <style>
+
+:root {
+    --primary-color: #2563eb;
+    --primary-color-dark: #1d4ed8;
+    --card-border: #e5e7eb;
+    --card-bg: #ffffff;
+    --page-bg: #f8fafc;
+    --text-main: #111827;
+    --text-muted: #4b5563;
+}
+
+div[data-testid="stAppViewContainer"] {
+    background-color: var(--page-bg);
+}
+
 div[data-testid="metric-container"] {
     background-color: #0f1117;
     border: 1px solid #2a2d3a;
     padding: 16px;
     border-radius: 10px;
 }
+.auth-scope h1,
+.auth-scope h2,
+.auth-scope h3 {
+    color: var(--text-main);
+}
+
+.auth-scope p,
+.auth-scope label {
+    color: var(--text-muted);
+}
+
+.auth-scope div[data-testid="stContainer"] {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+}
+
+.auth-scope .stButton > button {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: 1px solid var(--primary-color);
+}
+
+.auth-scope .stButton > button:hover {
+    background-color: var(--primary-color-dark);
+    border-color: var(--primary-color-dark);
+    color: #ffffff;
+}
+
+.auth-scope div[data-testid="stTextInput"] input {
+    background-color: #f3f4f6;
+    border: 1px solid var(--card-border);
+}
+
 div[data-testid="stSelectbox"],
 div[data-testid="stTextInput"] {
     max-width: 480px;
@@ -888,10 +937,12 @@ def login_view():
 
     # ---------- Handle login ----------
     if not login_clicked:
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     if not u or not p:
         st.error("Username and password are required.")
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     user = authenticate(u, p)
@@ -900,6 +951,7 @@ def login_view():
         if st.session_state.login_fails >= 5:
             st.session_state.lock_until = datetime.now() + timedelta(seconds=30)
         st.error("Invalid credentials")
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     st.session_state.login_fails = 0
@@ -911,6 +963,7 @@ def login_view():
 
     # Decide next page
     st.session_state.page = "recovery_setup" if st.session_state.first_login == 1 else "solver"
+    st.markdown("</div>", unsafe_allow_html=True)
     st.rerun()
 
 
@@ -1517,10 +1570,12 @@ def recovery_setup_view():
 
 def password_recovery_view():
     st.subheader("Account Recovery")
+    st.markdown("<div class=\"auth-scope\">", unsafe_allow_html=True)
 
     # Back navigation
     if st.button("Back to login"):
         st.session_state.page = "login"
+        st.markdown("</div>", unsafe_allow_html=True)
         st.rerun()
 
     # Initialise state
@@ -1530,6 +1585,7 @@ def password_recovery_view():
     username = st.text_input("Enter your username")
 
     if not username:
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     con = get_db()
@@ -1546,12 +1602,14 @@ def password_recovery_view():
 
     if not row:
         st.error("User not found.")
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     q1, q2, h1, h2 = row
 
     if not q1 or not q2 or not h1 or not h2:
         st.error("Recovery questions are not set for this account.")
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     # -----------------------------
@@ -1573,10 +1631,12 @@ def password_recovery_view():
             if hash_answer(ans1) == h1 and hash_answer(ans2) == h2:
                 st.session_state.recovery_verified = True
                 st.session_state.reset_user = username
+                st.markdown("</div>", unsafe_allow_html=True)
                 st.rerun()
             else:
                 st.error("Recovery answers do not match.")
-
+                
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     # -----------------------------
@@ -1596,6 +1656,7 @@ def password_recovery_view():
             ok, msg = update_password(st.session_state.reset_user, new_pw)
             if not ok:
                 st.error(msg)
+                st.markdown("</div>", unsafe_allow_html=True)
                 return
 
             st.success("Password reset successful. You can now log in.")
@@ -1604,13 +1665,17 @@ def password_recovery_view():
             st.session_state.recovery_verified = False
             st.session_state.reset_user = None
             st.session_state.page = "login"
+            st.markdown("</div>", unsafe_allow_html=True)
             st.rerun()
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def signup_view():
     left, center, right = st.columns([1, 2, 1])
     with center:
         st.subheader("Create an account")
+        st.markdown("<div class=\"auth-scope\">", unsafe_allow_html=True)
 
         with st.container(border=True):
             with st.form("signup_form"):
@@ -1624,18 +1689,22 @@ def signup_view():
             with back_col:
                 if st.button("Back to login", key="signup_back"):
                     st.session_state.page = "login"
+                    st.markdown("</div>", unsafe_allow_html=True)
                     st.rerun()
 
     if not submitted:
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     if not u or not p or not phone:
         st.error("Username, password, and phone number are required.")
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     ok, msg = validate_password_strength(p)
     if not ok:
         st.error(msg)
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     ok, msg = create_user(
@@ -1649,9 +1718,12 @@ def signup_view():
     if ok:
         st.success("Account created successfully. Please log in.")
         st.session_state.page = "login"
+        st.markdown("</div>", unsafe_allow_html=True)
         st.rerun()
     else:
         st.error(msg)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
    
 
