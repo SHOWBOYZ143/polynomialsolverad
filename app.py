@@ -82,7 +82,7 @@ div[data-testid="metric-container"] {
 .auth-scope .stButton > button:hover {
     background-color: var(--primary-color-dark);
     border-color: var(--primary-color-dark);
-    color: #ffffff;
+    color: #82cbed;
 }
 
 .auth-scope .stButton > button:focus {
