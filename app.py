@@ -26,10 +26,9 @@ if "show_menu" not in st.session_state:
 
 if "page" not in st.session_state:
     st.session_state.page = "solver"
-
 st.markdown("""
-<style>
 
+<style>
 :root {
     --primary-color: #2563eb;
     --primary-color-dark: #1d4ed8;
@@ -50,6 +49,7 @@ div[data-testid="metric-container"] {
     padding: 16px;
     border-radius: 10px;
 }
+
 .auth-scope h1,
 .auth-scope h2,
 .auth-scope h3 {
@@ -903,6 +903,7 @@ def logout():
 
 def login_view():
     st.markdown("<h1 style=\"text-align: center;\">Polynomial Solver Portal</h1>", unsafe_allow_html=True)
+    st.markdown("<div class=\"auth-scope\">", unsafe_allow_html=True)
 
     # ---------- Lockout handling ----------
     st.session_state.setdefault("login_fails", 0)
@@ -911,6 +912,7 @@ def login_view():
     if st.session_state.lock_until:
         if datetime.now() < st.session_state.lock_until:
             st.error("Too many attempts. Try again shortly.")
+            st.markdown("</div>", unsafe_allow_html=True)
             return
         st.session_state.lock_until = None
         st.session_state.login_fails = 0
