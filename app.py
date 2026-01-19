@@ -1321,7 +1321,38 @@ def solver_view():
 
         ymin, ymax = np.min(y), np.max(y)
         pad = 0.1 * (ymax - ymin if ymax != ymin else 1)
-        ax.set_ylim(ymin - pad,ymax + pad)
+        ax.set_ylim(ymin - pad, ymax + pad)
+
+        if st.session_state.roots is not None:
+            real_roots = [
+                r.real
+                for r in st.session_state.roots
+                if abs(r.imag) < 1e-6
+            ]
+            roots_in_view = [
+                root for root in real_roots
+                if st.session_state.xlim[0] <= root <= st.session_state.xlim[1]
+            ]
+            if roots_in_view:
+                ax.scatter(
+                    roots_in_view,
+                    [0] * len(roots_in_view),
+                    color="#d55e00",
+                    marker="o",
+                    s=48,
+                    zorder=3,
+                    label="Roots"
+                )
+                for root in roots_in_view:
+                    ax.annotate(
+                        f"{root:.4g}",
+                        (root, 0),
+                        textcoords="offset points",
+                        xytext=(0, 8),
+                        ha="center",
+                        color="#d55e00",
+                        fontsize=9
+                    )
 
 
     if st.session_state.comparison_mode and len(run_options) >= 2:
