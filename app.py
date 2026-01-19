@@ -34,7 +34,7 @@ st.markdown("""
     --primary-color-dark: #1d4ed8;
     --primary-soft: #dbeafe;
     --card-border: #93c0fa;
-    --card-bg:#74f2a9;
+    --card-bg:#79aaf7;
     --page-bg: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
     --text-main: #111827;
     --text-muted: #4b5563;
