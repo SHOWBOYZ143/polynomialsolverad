@@ -1943,7 +1943,7 @@ def user_view():
 def top_right_menu():
     if not st.session_state.get("logged_in", False):
         return
-   _, history_col, logout_col = st.columns([0.7, 0.15, 0.15])
+    history_col, logout_col = st.columns([0.7, 0.15, 0.15])
 
     with history_col:
         if st.button("History", key="history_btn"):
