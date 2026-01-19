@@ -1299,10 +1299,16 @@ def solver_view():
     # =========================
     st.markdown("### Graph Window")
 
-    fig, ax = plt.subplots(figsize=(9, 4))
-    ax.axhline(0)
-    ax.axvline(0)
-
+    fig, ax = plt.subplots(figsize=(9, 4), constrained_layout=True)
+    ax.set_xlim(*st.session_state.xlim)
+    ax.axhline(0, color="#222222", linewidth=1.2)
+    ax.axvline(0, color="#222222", linewidth=1.2)
+    ax.set_xlabel("x")
+    ax.set_ylabel("f(x)")
+    ax.grid(True, linestyle="--", linewidth=0.6, alpha=0.4)
+    ax.tick_params(axis="both", which="both", labelsize=9)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
     x = np.linspace(*st.session_state.xlim, 800)
 
 
