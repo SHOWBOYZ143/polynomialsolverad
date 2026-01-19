@@ -70,7 +70,7 @@ div[data-testid="metric-container"] {
 .auth-scope div[data-testid="stContainer"] {
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
-    box-shadow: 0 12px 24px rgba(50, 50, 255, 0.80);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.40);
 }
 
 .auth-scope .stButton > button {
