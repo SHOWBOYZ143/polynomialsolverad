@@ -1743,10 +1743,10 @@ def signup_view():
    
 
 def create_user_view():
-    st.subheader("Create User")
-
+    
     left, center, right = st.columns([1, 2, 1])
     with center:
+        st.subheader("Create User")
         with st.container(border=True):
             col_a, col_b = st.columns(2)
             with col_a:
