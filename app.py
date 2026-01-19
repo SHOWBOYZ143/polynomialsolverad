@@ -1515,11 +1515,11 @@ def admin_stats_view():
     # ---------- Highlighting ----------
     def highlight_rows(row):
         if row["Role"] == "admin":
-            return ["background-color:#111827; color:#e5e7eb"] * len(row)
+            return ["background-color:#658feb; color:#b3c9f5"] * len(row)
         if row["First Login"] == "Pending":
-            return ["background-color:#3b2f2f"] * len(row)
+            return ["background-color:#fcf5b1"] * len(row)
         if row["Inactive Label"] == "Yes":
-            return ["color:#9ca3af"] * len(row)
+            return ["color:#b0c9f5"] * len(row)
         return [""] * len(row)
 
     st.dataframe(
