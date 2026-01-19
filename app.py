@@ -30,14 +30,14 @@ st.markdown("""
 
 <style>
 :root {
-    --primary-color: #4f46e5;
-    --primary-color-dark: #4338ca;
-    --primary-soft: #eef2ff;
-    --card-border: #d6e0f0;
+    --primary-color: #4338ca;
+    --primary-color-dark: #3730a3;
+    --primary-soft: #e0e7ff;
+    --card-border: #c7d2fe;
     --card-bg: #ffffff;
-    --page-bg: linear-gradient(180deg, #f5f8ff 0%, #eef2ff 100%);
-    --text-main: #1f2937;
-    --text-muted: #6b7280;
+    --page-bg: linear-gradient(180deg, #edf2ff 0%, #e0e7ff 100%);
+    --text-main: #111827;
+    --text-muted: #4b5563;
 }
 
 div[data-testid="stAppViewContainer"] {
