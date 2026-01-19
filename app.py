@@ -1168,7 +1168,7 @@ def solver_view():
     # State for rename panel
     # -----------------------------
     st.session_state.setdefault(f"show_rename_{key_ns}", False)
-   st.session_state.setdefault("history_limit", 50)
+    st.session_state.setdefault("history_limit", 50)
     history_options = [25, 50, 100, 250]
     history_index = (
         history_options.index(st.session_state.history_limit)
