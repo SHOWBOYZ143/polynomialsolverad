@@ -75,7 +75,7 @@ div[data-testid="metric-container"] {
 
 .auth-scope .stButton > button {
     background-color: var(--primary-color);
-    color: #ffffff;
+    color: #82cbed;
     border: 1px solid var(--primary-color);
 }
 
