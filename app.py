@@ -1745,39 +1745,45 @@ def signup_view():
 def create_user_view():
     st.subheader("Create User")
 
-    u = st.text_input("Username", key="create_user_name")
-    p = st.text_input("Temporary Password", type="password", key="create_user_pass")
-    r = st.selectbox("Role", ["user", "admin"], key="create_user_role")
+    left, center, right = st.columns([1, 2, 1])
+    with center:
+        with st.container(border=True):
+            col_a, col_b = st.columns(2)
+            with col_a:
+                u = st.text_input("Username", key="create_user_name")
+            with col_b:
+                p = st.text_input("Temporary Password", type="password", key="create_user_pass")
 
-    phone = st.text_input("Phone number (required)", key="create_user_phone")
-    email = st.text_input("Email (optional)", key="create_user_email")
+            col_c, col_d = st.columns(2)
+            with col_c:
+                r = st.selectbox("Role", ["user", "admin"], key="create_user_role")
+            with col_d:
+                phone = st.text_input("Phone number (required)", key="create_user_phone")
 
-    if st.button("Create user"):
-        if not u or not p or not phone:
-            st.error("Username, password, and phone number are required.")
-            return
+            email = st.text_input("Email (optional)", key="create_user_email")
 
-        ok, msg = validate_password_strength(p)
-        if not ok:
-            st.error(msg)
-            return
+            if st.button("Create user"):
+                if not u or not p or not phone:
+                    st.error("Username, password, and phone number are required.")
+                    return
 
+                ok, msg = validate_password_strength(p)
+                if not ok:
+                    st.error(msg)
+                    return
 
-        ok, msg = create_user(
-            username=u,
-            pw=p,
-            role=r,
-            phone=phone,
-            email=email if email else None
-        )
+                ok, msg = create_user(
+                    username=u,
+                    pw=p,
+                    role=r,
+                    phone=phone,
+                    email=email if email else None
+                )
 
-        if ok:
-            st.success(msg)
-            
-           
-        else:
-            st.error(msg)
-
+                if ok:
+                    st.success(msg)
+                else:
+                    st.error(msg)
 
 
 
