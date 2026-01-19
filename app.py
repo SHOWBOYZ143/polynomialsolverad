@@ -1695,14 +1695,16 @@ def signup_view():
                 p = st.text_input("Password", type="password", key="signup_pass")
                 phone = st.text_input("Phone number (required)", key="signup_phone")
                 email = st.text_input("Email (optional)", key="signup_email")
-                submitted = st.form_submit_button("Create account")
+                action_col, back_col = st.columns([1, 1])
+                with action_col:
+                    submitted = st.form_submit_button("Create account")
+                with back_col:
+                    back_clicked = st.form_submit_button("Back to login")
 
-            _, back_col = st.columns([1, 1])
-            with back_col:
-                if st.button("Back to login", key="signup_back"):
-                    st.session_state.page = "login"
-                    st.markdown("</div>", unsafe_allow_html=True)
-                    st.rerun()
+            if back_clicked:
+                st.session_state.page = "login"
+                st.markdown("</div>", unsafe_allow_html=True)
+                st.rerun()
 
     if not submitted:
         st.markdown("</div>", unsafe_allow_html=True)
