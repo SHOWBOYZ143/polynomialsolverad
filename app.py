@@ -30,17 +30,22 @@ st.markdown("""
 
 <style>
 :root {
-    --primary-color: #2563eb;
-    --primary-color-dark: #1d4ed8;
-    --card-border: #e5e7eb;
+    --primary-color: #4f46e5;
+    --primary-color-dark: #4338ca;
+    --primary-soft: #eef2ff;
+    --card-border: #d6e0f0;
     --card-bg: #ffffff;
-    --page-bg: #f8fafc;
-    --text-main: #111827;
-    --text-muted: #4b5563;
+    --page-bg: linear-gradient(180deg, #f5f8ff 0%, #eef2ff 100%);
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
 }
 
 div[data-testid="stAppViewContainer"] {
     background-color: var(--page-bg);
+}
+
+div[data-testid="stAppViewContainer"] > .main {
+    background: var(--page-bg);
 }
 
 div[data-testid="metric-container"] {
@@ -79,8 +84,13 @@ div[data-testid="metric-container"] {
     color: #ffffff;
 }
 
+.auth-scope .stButton > button:focus {
+    outline: 3px solid rgba(79, 70, 229, 0.2);
+    outline-offset: 1px;
+}
+
 .auth-scope div[data-testid="stTextInput"] input {
-    background-color: #f3f4f6;
+    background-color: var(--primary-soft);
     border: 1px solid var(--card-border);
 }
 
