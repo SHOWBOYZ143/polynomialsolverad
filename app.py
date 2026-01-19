@@ -1350,7 +1350,7 @@ def view_users_view():
     ).fetchall()
     con.close()
 
-    st.dataframe(
+    df = pd.DataFrame(
         [
             {
                 "Username": r[0],
@@ -1358,7 +1358,20 @@ def view_users_view():
                 "First Login": "Yes" if r[2] else "No"
             }
             for r in rows
-        ],
+           ]
+    )
+
+    def highlight_columns(column):
+        if column.name == "Username":
+            return ["background-color:#dcfce7"] * len(column)
+        if column.name == "Role":
+            return ["background-color:#fef9c3"] * len(column)
+        if column.name == "First Login":
+            return ["background-color:#ffedd5"] * len(column)
+        return [""] * len(column)
+
+    st.dataframe(
+        df.style.apply(highlight_columns, axis=0), 
         use_container_width=True
     )
 
