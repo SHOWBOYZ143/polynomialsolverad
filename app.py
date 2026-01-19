@@ -1168,18 +1168,22 @@ def solver_view():
     # State for rename panel
     # -----------------------------
     st.session_state.setdefault(f"show_rename_{key_ns}", False)
-    st.session_state.setdefault("history_limit", 50)
-
+   st.session_state.setdefault("history_limit", 50)
+    history_options = [25, 50, 100, 250]
+    history_index = (
+        history_options.index(st.session_state.history_limit)
+        if st.session_state.history_limit in history_options
+        else 1
+    )
     history_limit = st.selectbox(
         "Show recent runs",
-        [25, 50, 100, 250],
-        index=[25, 50, 100, 250].index(st.session_state.history_limit),
+        history_options,
+        index=history_index,
         key="history_limit"
     )
-    st.session_state.history_limit = history_limit
     st.caption("Showing the most recent runs for faster load times.")
-
     rows = fetch_user_history(st.session_state.username, history_limit)
+
 
     run_options = []
     id_map = {}
