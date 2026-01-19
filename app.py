@@ -875,15 +875,16 @@ def login_view():
                 p = st.text_input("Password", type="password", key="login_pass")
                 login_clicked = st.form_submit_button("Login")
 
-            forgot_col, _ = st.columns([1, 1])
+            forgot_col, signup_col = st.columns([1, 1])
             with forgot_col:
                 if st.button("Forgot password?", key="forgot_btn"):
                     st.session_state.page = "recover"
                     st.rerun()
 
-            if st.button("Create account", key="signup_btn"):
-                st.session_state.page = "signup"
-                st.rerun()
+            with signup_col:
+                if st.button("Create account", key="signup_btn"):
+                    st.session_state.page = "signup"
+                    st.rerun()
 
     # ---------- Handle login ----------
     if not login_clicked:
