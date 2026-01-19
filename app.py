@@ -1744,7 +1744,7 @@ def signup_view():
 
 def create_user_view():
     
-    st.markdown("<h2 style=\"text-align: center;\">create User</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style=\"text-align: center;\">Create User</h2>", unsafe_allow_html=True)
 
     
     left, center, right = st.columns([1, 2, 1])
