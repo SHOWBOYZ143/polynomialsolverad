@@ -30,15 +30,16 @@ st.markdown("""
 
 <style>
 :root {
-    --primary-color: #4338ca;
-    --primary-color-dark: #3730a3;
-    --primary-soft: #e0e7ff;
-    --card-border: #c7d2fe;
+    --primary-color: #2563eb;
+    --primary-color-dark: #1d4ed8;
+    --primary-soft: #dbeafe;
+    --card-border: #93c5fd;
     --card-bg: #ffffff;
-    --page-bg: linear-gradient(180deg, #edf2ff 0%, #e0e7ff 100%);
+    --page-bg: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
     --text-main: #111827;
     --text-muted: #4b5563;
 }
+
 
 div[data-testid="stAppViewContainer"] {
     background-color: var(--page-bg);
