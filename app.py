@@ -1743,7 +1743,7 @@ def signup_view():
    
 
 def create_user_view():
-    st.subheader("Create User")
+    
     st.markdown("<h2 style=\"text-align: center;\">create User</h2>", unsafe_allow_html=True)
 
     
