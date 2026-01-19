@@ -533,6 +533,21 @@ def ensure_users_schema_v2():
     con.commit()
     con.close()
 
+def ensure_history_indexes():
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute(
+            "CREATE INDEX IF NOT EXISTS idx_history_user_created ON history (username, created_at DESC)"
+        )
+    except DB_ERRORS:
+        con.close()
+        return
+    con.commit()
+    con.close()
+
+
+
 def ensure_users_schema_v3():
     con = get_db()
     cur = con.cursor()
