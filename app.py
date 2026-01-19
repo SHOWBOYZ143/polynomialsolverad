@@ -1697,7 +1697,7 @@ def signup_view():
                 email = st.text_input("Email (optional)", key="signup_email")
                 submitted = st.form_submit_button("Create account")
 
-            back_col, _ = st.columns([1, 1])
+            _, back_col = st.columns([1, 1])
             with back_col:
                 if st.button("Back to login", key="signup_back"):
                     st.session_state.page = "login"
