@@ -86,7 +86,7 @@ div[data-testid="metric-container"] {
 }
 
 .auth-scope .stButton > button:focus {
-    outline: 3px solid rgba(79, 70, 229, 0.2);
+    outline: 3px solid rgba(79, 70, 229, 0.52);
     outline-offset: 1px;
 }
 
