@@ -33,13 +33,18 @@ st.markdown("""
     --primary-color: #2563eb;
     --primary-color-dark: #1d4ed8;
     --primary-soft: #dbeafe;
-    --card-border: #93c0fa;
-    --card-bg:#79aaf7;
+    --card-border: #93c5fd;
+    --card-bg: #e0f2fe;
     --page-bg: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
     --text-main: #111827;
     --text-muted: #4b5563;
+    --btn-primary: #2563eb;
+    --btn-primary-hover: #1d4ed8;
+    --btn-secondary: #0ea5e9;
+    --btn-secondary-hover: #0284c7;
+    --btn-danger: #dc2626;
+    --btn-danger-hover: #b91c1c;
 }
-
 
 div[data-testid="stAppViewContainer"] {
     background-color: var(--page-bg);
@@ -70,24 +75,89 @@ div[data-testid="metric-container"] {
 .auth-scope div[data-testid="stContainer"] {
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.40);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
 }
 
 .auth-scope .stButton > button {
     background-color: var(--primary-color);
-    color: #82cbed;
+    color: #ffffff;
     border: 1px solid var(--primary-color);
 }
 
 .auth-scope .stButton > button:hover {
     background-color: var(--primary-color-dark);
     border-color: var(--primary-color-dark);
-    color: #82cbed;
+    color: #ffffff;
 }
 
 .auth-scope .stButton > button:focus {
-    outline: 3px solid rgba(79, 70, 229, 0.52);
+    outline: 3px solid rgba(37, 99, 235, 0.25);
     outline-offset: 1px;
+}
+
+.stButton > button[aria-label="Login"],
+.stButton > button[aria-label="Create account"],
+.stButton > button[aria-label="Create user"],
+.stButton > button[aria-label="Save as new version"],
+.stButton > button[aria-label="Save recovery details"],
+.stButton > button[aria-label="Reset password"],
+.stButton > button[aria-label="Solve and Plot"] {
+    background-color: var(--btn-primary);
+    border-color: var(--btn-primary);
+    color: #ffffff;
+}
+
+.stButton > button[aria-label="Login"]:hover,
+.stButton > button[aria-label="Create account"]:hover,
+.stButton > button[aria-label="Create user"]:hover,
+.stButton > button[aria-label="Save as new version"]:hover,
+.stButton > button[aria-label="Save recovery details"]:hover,
+.stButton > button[aria-label="Reset password"]:hover,
+.stButton > button[aria-label="Solve and Plot"]:hover {
+    background-color: var(--btn-primary-hover);
+    border-color: var(--btn-primary-hover);
+}
+
+.stButton > button[aria-label="Forgot password?"],
+.stButton > button[aria-label="Back to login"],
+.stButton > button[aria-label="⬅ Back to Solver"],
+.stButton > button[aria-label="Reuse"],
+.stButton > button[aria-label="Rename"],
+.stButton > button[aria-label="Export selected run as CSV"],
+.stButton > button[aria-label="Zoom in"],
+.stButton > button[aria-label="Zoom out"],
+.stButton > button[aria-label="Reset view"],
+.stButton > button[aria-label="History"] {
+    background-color: var(--btn-secondary);
+    border-color: var(--btn-secondary);
+    color: #ffffff;
+}
+
+.stButton > button[aria-label="Forgot password?"]:hover,
+.stButton > button[aria-label="Back to login"]:hover,
+.stButton > button[aria-label="⬅ Back to Solver"]:hover,
+.stButton > button[aria-label="Reuse"]:hover,
+.stButton > button[aria-label="Rename"]:hover,
+.stButton > button[aria-label="Export selected run as CSV"]:hover,
+.stButton > button[aria-label="Zoom in"]:hover,
+.stButton > button[aria-label="Zoom out"]:hover,
+.stButton > button[aria-label="Reset view"]:hover,
+.stButton > button[aria-label="History"]:hover {
+    background-color: var(--btn-secondary-hover);
+    border-color: var(--btn-secondary-hover);
+}
+
+.stButton > button[aria-label="Delete"],
+.stButton > button[aria-label="Logout"] {
+    background-color: var(--btn-danger);
+    border-color: var(--btn-danger);
+    color: #ffffff;
+}
+
+.stButton > button[aria-label="Delete"]:hover,
+.stButton > button[aria-label="Logout"]:hover {
+    background-color: var(--btn-danger-hover);
+    border-color: var(--btn-danger-hover);
 }
 
 .auth-scope div[data-testid="stTextInput"] input {
