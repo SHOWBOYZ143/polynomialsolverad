@@ -1607,18 +1607,23 @@ def password_recovery_view():
 
 
 def signup_view():
-    st.subheader("Create an account")
+    left, center, right = st.columns([1, 2, 1])
+    with center:
+        st.subheader("Create an account")
 
-    with st.form("signup_form"):
-        u = st.text_input("Username", key="signup_user").strip()
-        p = st.text_input("Password", type="password", key="signup_pass")
-        phone = st.text_input("Phone number (required)", key="signup_phone")
-        email = st.text_input("Email (optional)", key="signup_email")
-        submitted = st.form_submit_button("Create account")
+        with st.container(border=True):
+            with st.form("signup_form"):
+                u = st.text_input("Username", key="signup_user").strip()
+                p = st.text_input("Password", type="password", key="signup_pass")
+                phone = st.text_input("Phone number (required)", key="signup_phone")
+                email = st.text_input("Email (optional)", key="signup_email")
+                submitted = st.form_submit_button("Create account")
 
-    if st.button("Back to login", key="signup_back"):
-        st.session_state.page = "login"
-        st.rerun()
+            back_col, _ = st.columns([1, 1])
+            with back_col:
+                if st.button("Back to login", key="signup_back"):
+                    st.session_state.page = "login"
+                    st.rerun()
 
     if not submitted:
         return
@@ -1646,7 +1651,6 @@ def signup_view():
         st.rerun()
     else:
         st.error(msg)
-
 
    
 
