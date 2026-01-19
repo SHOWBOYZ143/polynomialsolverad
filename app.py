@@ -1943,15 +1943,17 @@ def user_view():
 def top_right_menu():
     if not st.session_state.get("logged_in", False):
         return
-    left, spacer, right = st.columns([0.7, 0.2, 0.1])
-    
-    with st.popover("☰"):
-        if st.button("History"):
-                st.session_state.page = "history"
-                st.rerun()
+   _, history_col, logout_col = st.columns([0.7, 0.15, 0.15])
 
-        if st.button("Logout"):
-                logout()
+    with history_col:
+        if st.button("History", key="history_btn"):
+            st.session_state.page = "history"
+            st.rerun()
+
+
+    with logout_col:
+        if st.button("Logout", key="logout_btn"):
+            logout()
 
 
 
