@@ -290,7 +290,7 @@ RECOVERY_QUESTIONS = [
 
 
 
-
+@st.cache_data(ttl=30)
 def get_user_stats(username):
     con = get_db()
     cur = con.cursor()
@@ -327,6 +327,19 @@ def get_user_stats(username):
         "first_login": "Yes" if first_login else "No",
         "inactive": inactive
     }
+
+@st.cache_data(ttl=30)
+def fetch_user_history(username, limit):
+    con = get_db()
+    rows = con.execute("""
+        SELECT id, coeffs, roots, created_at, calc_name, version
+        FROM history
+        WHERE username = ?
+        ORDER BY created_at DESC
+        LIMIT ?
+    """, (username, limit)).fetchall()
+    con.close()
+    return rows
 
 
 
@@ -637,6 +650,7 @@ def save_history(username, coeffs_text, roots_text, calc_name=None):
         SELECT COALESCE(MAX(version), 0) + 1
         FROM history
         WHERE username = ? AND coeffs = ?
+        
     """, (username, coeffs_text))
 
     next_version = cur.fetchone()[0]
@@ -662,6 +676,7 @@ def save_history(username, coeffs_text, roots_text, calc_name=None):
 
     con.commit()
     con.close()
+    fetch_user_history.clear()
 
 
 def format_roots_for_storage(roots):
@@ -1153,15 +1168,18 @@ def solver_view():
     # State for rename panel
     # -----------------------------
     st.session_state.setdefault(f"show_rename_{key_ns}", False)
+    st.session_state.setdefault("history_limit", 50)
 
-    con = get_db()
-    rows = con.execute("""
-        SELECT id, coeffs, roots, created_at, calc_name, version
-        FROM history
-        WHERE username = ?
-        ORDER BY created_at DESC
-    """, (st.session_state.username,)).fetchall()
-    con.close()
+    history_limit = st.selectbox(
+        "Show recent runs",
+        [25, 50, 100, 250],
+        index=[25, 50, 100, 250].index(st.session_state.history_limit),
+        key="history_limit"
+    )
+    st.session_state.history_limit = history_limit
+    st.caption("Showing the most recent runs for faster load times.")
+
+    rows = fetch_user_history(st.session_state.username, history_limit)
 
     run_options = []
     id_map = {}
@@ -1209,6 +1227,7 @@ def solver_view():
         # Rename panel (only when open)
         # -----------------------------
         if st.session_state.get(f"show_rename_{key_ns}", False):
+        
             new_name = st.text_input(
                 "New name",
                 value=calc_name or "",
@@ -1244,6 +1263,7 @@ def solver_view():
 
                     con.commit()
                     con.close()
+                    fetch_user_history.clear()
 
                     st.success("Saved as a new version.")
                     st.session_state[f"show_rename_{key_ns}"] = False
