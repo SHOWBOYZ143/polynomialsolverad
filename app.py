@@ -23,7 +23,7 @@ st.session_state.setdefault("reset_user", None)
 
 if "show_menu" not in st.session_state:
     st.session_state.show_menu = False
-
+ 
 if "page" not in st.session_state:
     st.session_state.page = "solver"
 st.markdown("""
