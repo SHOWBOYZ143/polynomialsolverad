@@ -1810,24 +1810,31 @@ def recovery_setup_view():
     st.subheader("Account Recovery Setup")
 
     
-    st.markdown("<div class=\"narrow-container\">", unsafe_allow_html=True)
-    with st.form("recovery_form"):
-        q1 = st.selectbox(
-            "Recovery question 1",
-            RECOVERY_QUESTIONS,
-            key="rq1"
-        )
+    left, center, right = st.columns([1, 1.6, 1])
+    with center:
+        st.markdown("<div class=\"narrow-container\">", unsafe_allow_html=True)
+        with st.container(border=True):
+            with st.form("recovery_form"):
+                q1 = st.selectbox(
+                    "Recovery question 1",
+                    RECOVERY_QUESTIONS,
+                    key="rq1"
+                )
 
-        q2 = st.selectbox(
-            "Recovery question 2",
-            RECOVERY_QUESTIONS,
-            key="rq2"
-        )
+                q2 = st.selectbox(
+                    "Recovery question 2",
+                     RECOVERY_QUESTIONS,
+                     key="rq2"
+                )
+            
+                a1 = st.text_input("Answer for question 1", type="password")
+                a2 = st.text_input("Answer for question 2", type="password")
 
-        a1 = st.text_input("Answer for question 1", type="password")
-        a2 = st.text_input("Answer for question 2", type="password")
+                submitted = st.form_submit_button("Save recovery details")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-        submitted = st.form_submit_button("Save recovery details")
+        
+
 
 
     st.markdown("</div>", unsafe_allow_html=True)
