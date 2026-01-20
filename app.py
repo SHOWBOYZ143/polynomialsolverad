@@ -30,6 +30,7 @@ PHONE_COUNTRIES = sorted(
     key=lambda item: (item["region"] != "GH", item["label"]),
 )
 
+
 st.session_state.setdefault("recovery_verified", False)
 st.session_state.setdefault("reset_user", None)
 st.session_state.setdefault("theme_mode", "light")
@@ -59,26 +60,28 @@ theme_vars = {
     "btn_danger": "#dc2626",
     "btn_danger_hover": "#b91c1c",
 }
-css_template = Template("""
+
+css_template = """
+
 
 st.markdown(f"""
 
 <style>
 :root {{
-    --primary-color: {theme_vars["primary_color"]};
-    --primary-color-dark: {theme_vars["primary_color_dark"]};
-    --primary-soft: {theme_vars["primary_soft"]};
-    --card-border: {theme_vars["card_border"]};
-    --card-bg: {theme_vars["card_bg"]};
-    --page-bg: {theme_vars["page_bg"]};
-    --text-main: {theme_vars["text_main"]};
-    --text-muted: {theme_vars["text_muted"]};
-    --btn-primary: {theme_vars["btn_primary"]};
-    --btn-primary-hover: {theme_vars["btn_primary_hover"]};
-    --btn-secondary: {theme_vars["btn_secondary"]};
-    --btn-secondary-hover: {theme_vars["btn_secondary_hover"]};
-    --btn-danger: {theme_vars["btn_danger"]};
-    --btn-danger-hover: {theme_vars["btn_danger_hover"]};
+    --primary-color: __PRIMARY_COLOR__;
+    --primary-color-dark: __PRIMARY_COLOR_DARK__;
+    --primary-soft: __PRIMARY_SOFT__;
+    --card-border: __CARD_BORDER__;
+    --card-bg: __CARD_BG__;
+    --page-bg: __PAGE_BG__;
+    --text-main: __TEXT_MAIN__;
+    --text-muted: __TEXT_MUTED__;
+    --btn-primary: __BTN_PRIMARY__;
+    --btn-primary-hover: __BTN_PRIMARY_HOVER__;
+    --btn-secondary: __BTN_SECONDARY__;
+    --btn-secondary-hover: __BTN_SECONDARY_HOVER__;
+    --btn-danger: __BTN_DANGER__;
+    --btn-danger-hover: __BTN_DANGER_HOVER__;
 }}
 
 div[data-testid="stAppViewContainer"] {
@@ -240,15 +243,33 @@ div[data-testid="stTextInput"] input {
     font-size: 0.85rem;
     color: var(--text-muted);
     margin-top: 4px;
-
+}
 
 .narrow-container {
     max-width: 520px;
+    width: 100%;
     margin: 0 auto;
 }
 </style>
-""")
-st.markdown(css_template.safe_substitute(theme_vars), unsafe_allow_html=True)
+"""
+css = (
+    css_template
+    .replace("__PRIMARY_COLOR__", theme_vars["primary_color"])
+    .replace("__PRIMARY_COLOR_DARK__", theme_vars["primary_color_dark"])
+    .replace("__PRIMARY_SOFT__", theme_vars["primary_soft"])
+    .replace("__CARD_BORDER__", theme_vars["card_border"])
+    .replace("__CARD_BG__", theme_vars["card_bg"])
+    .replace("__PAGE_BG__", theme_vars["page_bg"])
+    .replace("__TEXT_MAIN__", theme_vars["text_main"])
+    .replace("__TEXT_MUTED__", theme_vars["text_muted"])
+    .replace("__BTN_PRIMARY__", theme_vars["btn_primary"])
+    .replace("__BTN_PRIMARY_HOVER__", theme_vars["btn_primary_hover"])
+    .replace("__BTN_SECONDARY__", theme_vars["btn_secondary"])
+    .replace("__BTN_SECONDARY_HOVER__", theme_vars["btn_secondary_hover"])
+    .replace("__BTN_DANGER__", theme_vars["btn_danger"])
+    .replace("__BTN_DANGER_HOVER__", theme_vars["btn_danger_hover"])
+)
+st.markdown(css, unsafe_allow_html=True)
     
 
 # ======================================================
