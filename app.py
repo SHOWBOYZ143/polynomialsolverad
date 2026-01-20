@@ -1243,7 +1243,7 @@ def solver_view():
 
     st.session_state.root_count = st.selectbox(
         "Roots to solve",
-        list(range(1, 11)),
+        list(range(1, 101)),
         index=max(0, min(99, st.session_state.get("root_count", 1) - 1))
     )
        
