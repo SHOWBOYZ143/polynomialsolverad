@@ -33,7 +33,6 @@ PHONE_COUNTRIES = sorted(
 
 st.session_state.setdefault("recovery_verified", False)
 st.session_state.setdefault("reset_user", None)
-st.session_state.setdefault("theme_mode", "light")
 
 
 
@@ -43,7 +42,7 @@ if "show_menu" not in st.session_state:
 
 if "page" not in st.session_state:
     st.session_state.page = "solver"
-is_dark_mode = st.session_state.theme_mode == "dark"
+
 theme_vars = {
     "primary_color": "#2563eb",
     "primary_color_dark": "#1d4ed8",
@@ -288,14 +287,7 @@ div[data-testid="stTextInput"] input {
     width: 100%;
     margin: 0 auto;
 }
-label[for="theme_toggle_top"],
-div[data-testid="stToggle"]:has(input#theme_toggle_top) {
-    display: none !important;
-}
-div[data-testid="stToggle"]:has(span:contains("Dark mode")),
-label:has(span:contains("Dark mode")) {
-    display: none !important;
-}
+
 </style>
 '''
 css = (
@@ -2413,19 +2405,10 @@ def top_right_menu():
     if not st.session_state.get("logged_in", False):
         return
 
-    cols = st.columns([0.55, 0.15, 0.15, 0.15])
-    theme_col, history_col, logout_col = cols[1], cols[2], cols[3]
+    cols = st.columns([0.7, 0.15, 0.15])
+    history_col, logout_col = cols[1], cols[2]
 
-    with theme_col:
-        dark_mode = st.toggle(
-            "Dark mode",
-            value=st.session_state.get("theme_mode", "light") == "dark",
-            key="theme_toggle_top"
-        )
-        new_theme = "dark" if dark_mode else "light"
-        if st.session_state.get("theme_mode", "light") != new_theme:
-            st.session_state.theme_mode = new_theme
-            st.rerun()
+   
     with history_col:
         if st.button("History", key="history_btn"):
             st.session_state.page = "history"
