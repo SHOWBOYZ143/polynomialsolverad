@@ -217,6 +217,11 @@ div[data-testid="stTextInput"] input {
     font-size: 0.85rem;
     color: var(--text-muted);
     margin-top: 4px;
+
+
+.narrow-container {
+    max-width: 720px;
+    margin: 0 auto;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -1804,6 +1809,8 @@ def admin_stats_view():
 def recovery_setup_view():
     st.subheader("Account Recovery Setup")
 
+    
+    st.markdown("<div class=\"narrow-container\">", unsafe_allow_html=True)
     with st.form("recovery_form"):
         q1 = st.selectbox(
             "Recovery question 1",
@@ -1822,6 +1829,8 @@ def recovery_setup_view():
 
         submitted = st.form_submit_button("Save recovery details")
 
+
+    st.markdown("</div>", unsafe_allow_html=True)
     if submitted:
         con = get_db()
         cur = con.cursor()
