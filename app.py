@@ -64,7 +64,7 @@ theme_vars = {
 css_template = r'''
 
 
-st.markdown(f"""
+
 
 <style>
 :root {
