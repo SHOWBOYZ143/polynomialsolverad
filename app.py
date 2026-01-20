@@ -805,6 +805,12 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
         return False, "Password must include at least one special character."
     return True, ""
 
+def validate_phone_number(phone: str) -> tuple[bool, str]:
+    digits_only = re.sub(r"\D", "", phone or "")
+    if len(digits_only) > 15:
+        return False, "Phone number digits must not be more than 15."
+    return True, ""
+
 def password_strength_score(password: str) -> tuple[int, str, str]:
     if not password:
         return 0, "Enter a password", "weak"
@@ -1954,6 +1960,12 @@ def signup_view():
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
+    def validate_phone_number(phone: str) -> tuple[bool, str]:
+    digits_only = re.sub(r"\D", "", phone or "")
+    if len(digits_only) > 15:
+        return False, "Phone number digits must not be more than 15."
+    return True, ""
+
     ok, msg = validate_password_strength(p)
     if not ok:
         st.error(msg)
@@ -2007,6 +2019,11 @@ def create_user_view():
             if st.button("Create user"):
                 if not u or not p or not phone:
                     st.error("Username, password, and phone number are required.")
+                    return
+
+                ok, msg = validate_phone_number(phone)
+                if not ok:
+                    st.error(msg)
                     return
 
                 ok, msg = validate_password_strength(p)
