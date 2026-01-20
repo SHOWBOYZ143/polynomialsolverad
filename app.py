@@ -1961,7 +1961,7 @@ def signup_view():
         return
 
     def validate_phone_number(phone: str) -> tuple[bool, str]:
-    digits_only = re.sub(r"\D", "", phone or "")
+        digits_only = re.sub(r"\D", "", phone or "")
     if len(digits_only) > 15:
         return False, "Phone number digits must not be more than 15."
     return True, ""
