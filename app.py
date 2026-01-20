@@ -1241,7 +1241,7 @@ def solver_view():
         st.session_state.coeff_text = st.session_state.reuse_coeffs
         del st.session_state.reuse_coeffs
 
-    roots_col, _ = st.columns([1, 14])
+    roots_col, _ = st.columns([1, 13])
     with roots_col:
         st.session_state.root_count = st.selectbox(
             "Roots to solve",
