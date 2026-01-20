@@ -827,9 +827,9 @@ def validate_phone_number(phone_digits: str, region: str) -> tuple[bool, str, st
 
     reason = phonenumbers.is_possible_number_with_reason(parsed)
     if reason == phonenumbers.ValidationResult.TOO_SHORT:
-        return False, "Phone number is too short for the selected country.", ""
+        return False, "Phone number invalid.", ""
     if reason == phonenumbers.ValidationResult.TOO_LONG:
-        return False, "Phone number is too long for the selected country.", ""
+        return False, "Phone number invalid.", ""
     if not phonenumbers.is_valid_number(parsed):
         return False, "Phone number is not valid for the selected country.", ""
 
