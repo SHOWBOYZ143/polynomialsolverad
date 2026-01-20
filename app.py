@@ -2319,19 +2319,19 @@ def user_view():
 
         
 def top_right_menu():
+    if not st.session_state.get("logged_in", False):
+        return
+
     cols = st.columns([0.55, 0.15, 0.15, 0.15])
     theme_col, history_col, logout_col = cols[1], cols[2], cols[3]
 
     with theme_col:
         dark_mode = st.toggle(
             "Dark mode",
-            value=st.session_state.theme_mode == "dark",
+            value=st.session_state.get("theme_mode", "light") == "dark",
             key="theme_toggle_top"
         )
         st.session_state.theme_mode = "dark" if dark_mode else "light"
-   
-    cols = st.columns([0.7, 0.15, 0.15])
-    history_col, logout_col = cols[1], cols[2]
 
     with history_col:
         if st.button("History", key="history_btn"):
