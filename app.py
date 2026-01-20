@@ -34,30 +34,50 @@ st.session_state.setdefault("recovery_verified", False)
 st.session_state.setdefault("reset_user", None)
 
 
+
 if "show_menu" not in st.session_state:
     st.session_state.show_menu = False
- 
+
+
 if "page" not in st.session_state:
     st.session_state.page = "solver"
-st.markdown("""
+is_dark_mode = st.session_state.theme_mode == "dark"
+theme_vars = {
+    "primary_color": "#60a5fa" if is_dark_mode else "#2563eb",
+    "primary_color_dark": "#3b82f6" if is_dark_mode else "#1d4ed8",
+    "primary_soft": "#1f2937" if is_dark_mode else "#dbeafe",
+    "card_border": "#374151" if is_dark_mode else "#93c5fd",
+    "card_bg": "#111827" if is_dark_mode else "#e0f2fe",
+    "page_bg": "#0b1120" if is_dark_mode else "linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%)",
+    "text_main": "#f9fafb" if is_dark_mode else "#111827",
+    "text_muted": "#9ca3af" if is_dark_mode else "#4b5563",
+    "btn_primary": "#2563eb",
+    "btn_primary_hover": "#1d4ed8",
+    "btn_secondary": "#0ea5e9",
+    "btn_secondary_hover": "#0284c7",
+    "btn_danger": "#dc2626",
+    "btn_danger_hover": "#b91c1c",
+}
+
+st.markdown(f"""
 
 <style>
-:root {
-    --primary-color: #2563eb;
-    --primary-color-dark: #1d4ed8;
-    --primary-soft: #dbeafe;
-    --card-border: #93c5fd;
-    --card-bg: #e0f2fe;
-    --page-bg: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
-    --text-main: #111827;
-    --text-muted: #4b5563;
-    --btn-primary: #2563eb;
-    --btn-primary-hover: #1d4ed8;
-    --btn-secondary: #0ea5e9;
-    --btn-secondary-hover: #0284c7;
-    --btn-danger: #dc2626;
-    --btn-danger-hover: #b91c1c;
-}
+:root {{
+    --primary-color: {theme_vars["primary_color"]};
+    --primary-color-dark: {theme_vars["primary_color_dark"]};
+    --primary-soft: {theme_vars["primary_soft"]};
+    --card-border: {theme_vars["card_border"]};
+    --card-bg: {theme_vars["card_bg"]};
+    --page-bg: {theme_vars["page_bg"]};
+    --text-main: {theme_vars["text_main"]};
+    --text-muted: {theme_vars["text_muted"]};
+    --btn-primary: {theme_vars["btn_primary"]};
+    --btn-primary-hover: {theme_vars["btn_primary_hover"]};
+    --btn-secondary: {theme_vars["btn_secondary"]};
+    --btn-secondary-hover: {theme_vars["btn_secondary_hover"]};
+    --btn-danger: {theme_vars["btn_danger"]};
+    --btn-danger-hover: {theme_vars["btn_danger_hover"]};
+}}
 
 div[data-testid="stAppViewContainer"] {
     background-color: var(--page-bg);
@@ -2331,8 +2351,10 @@ def top_right_menu():
             value=st.session_state.get("theme_mode", "light") == "dark",
             key="theme_toggle_top"
         )
-        st.session_state.theme_mode = "dark" if dark_mode else "light"
-
+        new_theme = "dark" if dark_mode else "light"
+        if st.session_state.get("theme_mode", "light") != new_theme:
+            st.session_state.theme_mode = new_theme
+            st.rerun()
     with history_col:
         if st.button("History", key="history_btn"):
             st.session_state.page = "history"
