@@ -61,14 +61,14 @@ theme_vars = {
     "btn_danger_hover": "#b91c1c",
 }
 
-css_template = """
+css_template = r'''
 
 
 st.markdown(f"""
 
 <style>
-:root {{
-    --primary-color: __PRIMARY_COLOR__;
+:root {
+     --primary-color: __PRIMARY_COLOR__;
     --primary-color-dark: __PRIMARY_COLOR_DARK__;
     --primary-soft: __PRIMARY_SOFT__;
     --card-border: __CARD_BORDER__;
@@ -82,7 +82,7 @@ st.markdown(f"""
     --btn-secondary-hover: __BTN_SECONDARY_HOVER__;
     --btn-danger: __BTN_DANGER__;
     --btn-danger-hover: __BTN_DANGER_HOVER__;
-}}
+}
 
 div[data-testid="stAppViewContainer"] {
     background-color: var(--page-bg);
@@ -251,7 +251,7 @@ div[data-testid="stTextInput"] input {
     margin: 0 auto;
 }
 </style>
-"""
+'''
 css = (
     css_template
     .replace("__PRIMARY_COLOR__", theme_vars["primary_color"])
@@ -1475,7 +1475,7 @@ def solver_view():
     # =========================
     st.markdown("### Graph Controls")
 
-    gc1, gc2, gc3, gc4, gc5, = st.columns([1, 1, 1, 1.2, 1.2,  ])
+    gc1, gc2, gc3, gc4, gc5, gc6 = st.columns([1, 1, 1, 1.2, 1.2, 1])
     with gc1:
         if st.button("Zoom in", key=f"zoom_in_{key_ns}"):
             a, b = st.session_state.xlim
@@ -1507,6 +1507,9 @@ def solver_view():
             index=0 if st.session_state.graph_fmt == "PNG" else 1,
             key=f"img_fmt_{key_ns}"
         )
+
+    with gc6:
+        st.write("")
 
     
 
@@ -1589,7 +1592,6 @@ def solver_view():
                 color="#111827",
                 bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#d1d5db", alpha=0.85)
             )
-
 
     if st.session_state.comparison_mode and len(run_options) >= 2:
         a, b = st.columns(2)
