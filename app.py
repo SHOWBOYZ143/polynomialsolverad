@@ -174,6 +174,38 @@ div[data-testid="stSelectbox"] > div,
 div[data-testid="stTextInput"] input {
     width: 100%;
 }
+
+.password-strength {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.password-strength__bar {
+    height: 100%;
+    transition: width 0.2s ease;
+}
+
+.password-strength__bar--weak {
+    background: #ef4444;
+}
+
+.password-strength__bar--fair {
+    background: #f59e0b;
+}
+
+.password-strength__bar--good,
+.password-strength__bar--strong {
+    background: #22c55e;
+}
+
+.password-strength__label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
 </style>
 """, unsafe_allow_html=True)
     
@@ -773,9 +805,9 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
         return False, "Password must include at least one special character."
     return True, ""
 
-def password_strength_score(password: str) -> tuple[int, str]:
+def password_strength_score(password: str) -> tuple[int, str, str]:
     if not password:
-        return 0, "Enter a password"
+        return 0, "Enter a password", "weak"
     score = 0
     if len(password) >= 8:
         score += 1
@@ -792,15 +824,31 @@ def password_strength_score(password: str) -> tuple[int, str]:
 
     if score <= 1:
         label = "Weak"
+        tone = "weak"
     elif score <= 3:
         label = "Fair"
+        tone = "fair"
     elif score <= 4:
         label = "Good"
+        tone = "good"
     else:
         label = "Strong"
+        tone = "strong"
 
     percent = int(score / 6 * 100)
-    return percent, label
+    return percent, label, tone
+
+def render_password_strength(password: str) -> None:
+    percent, label, tone = password_strength_score(password)
+    st.markdown(
+        f"""
+        <div class="password-strength">
+            <div class="password-strength__bar password-strength__bar--{tone}" style="width: {percent}%;"></div>
+        </div>
+        <div class="password-strength__label">Strength: {label}</div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 
@@ -1115,8 +1163,7 @@ def login_view():
 def forced_password_change():
     st.warning("Change your password before proceeding")
     p1 = st.text_input("New password", type="password")
-    strength_value, strength_label = password_strength_score(p1)
-    st.progress(strength_value, text=f"Strength: {strength_label}")
+    render_password_strength(p1)
     p2 = st.text_input("Confirm password", type="password")
     if st.button("Save"):
         if p1 != p2:
@@ -1848,8 +1895,7 @@ def password_recovery_view():
     st.success("Identity verified. Set a new password.")
 
     new_pw = st.text_input("New password", type="password")
-    strength_value, strength_label = password_strength_score(new_pw)
-    st.progress(strength_value, text=f"Strength: {strength_label}")
+    render_password_strength(new_pw)
     confirm_pw = st.text_input("Confirm password", type="password")
 
     if st.button("Reset password"):
@@ -1883,18 +1929,16 @@ def signup_view():
         st.markdown("<div class=\"auth-scope\">", unsafe_allow_html=True)
 
         with st.container(border=True):
-            with st.form("signup_form"):
-                u = st.text_input("Username", key="signup_user").strip()
-                p = st.text_input("Password", type="password", key="signup_pass")
-                strength_value, strength_label = password_strength_score(p)
-                st.progress(strength_value, text=f"Strength: {strength_label}")
-                phone = st.text_input("Phone number (required)", key="signup_phone")
-                email = st.text_input("Email (optional)", key="signup_email")
-                action_col, back_col = st.columns([1, 1])
-                with action_col:
-                    submitted = st.form_submit_button("Create account")
-                with back_col:
-                    back_clicked = st.form_submit_button("Back to login")
+            u = st.text_input("Username", key="signup_user").strip()
+            p = st.text_input("Password", type="password", key="signup_pass")
+            render_password_strength(p)
+            phone = st.text_input("Phone number (required)", key="signup_phone")
+            email = st.text_input("Email (optional)", key="signup_email")
+            action_col, back_col = st.columns([1, 1])
+            with action_col:
+                submitted = st.button("Create account", key="signup_submit")
+            with back_col:
+                back_clicked = st.button("Back to login", key="signup_back")
 
             if back_clicked:
                 st.session_state.page = "login"
@@ -1950,8 +1994,7 @@ def create_user_view():
                 u = st.text_input("Username", key="create_user_name")
             with col_b:
                 p = st.text_input("Temporary Password", type="password", key="create_user_pass")
-                strength_value, strength_label = password_strength_score(p)
-                st.progress(strength_value, text=f"Strength: {strength_label}")
+                render_password_strength(p)
 
             col_c, col_d = st.columns(2)
             with col_c:
