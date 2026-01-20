@@ -83,6 +83,10 @@ css_template = r'''
     --btn-danger-hover: __BTN_DANGER_HOVER__;
 }
 
+html,
+body,
+.stApp,
+
 div[data-testid="stAppViewContainer"] {
     background-color: var(--page-bg);
 }
@@ -222,6 +226,12 @@ div[data-testid="stSelectbox"] div[role="button"] {
     color: var(--text-main);
 }
 
+div[data-testid="stSelectbox"] div[role="listbox"] {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+}
+
 div[data-testid="stMarkdownContainer"],
 label,
 .stText,
@@ -231,7 +241,6 @@ label,
 .stTitle {
     color: var(--text-main);
 }
-
 div[data-testid="stSelectbox"],
 div[data-testid="stTextInput"] {
     max-width: 480px;
