@@ -220,7 +220,7 @@ div[data-testid="stTextInput"] input {
 
 
 .narrow-container {
-    max-width: 720px;
+    max-width: 520px;
     margin: 0 auto;
 }
 </style>
