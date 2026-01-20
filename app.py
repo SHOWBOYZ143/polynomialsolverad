@@ -1506,6 +1506,22 @@ def solver_view():
                         fontsize=9
                     )
 
+            roots_text = "Solved roots:\n" + "\n".join(
+                f"x{superscript(i)} = {format_root(r)}"
+                for i, r in enumerate(st.session_state.roots, 1)
+            )
+            ax.text(
+                0.02,
+                0.98,
+                roots_text,
+                transform=ax.transAxes,
+                va="top",
+                ha="left",
+                fontsize=8,
+                color="#111827",
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#d1d5db", alpha=0.85)
+            )
+
 
     if st.session_state.comparison_mode and len(run_options) >= 2:
         a, b = st.columns(2)
