@@ -1234,7 +1234,7 @@ def solver_view():
     # =========================
     # POLYNOMIAL INPUT
     # =========================
-if "coeff_text" not in st.session_state:
+    if "coeff_text" not in st.session_state:
        st.session_state.coeff_text = ""
 
     if "reuse_coeffs" in st.session_state:
