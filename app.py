@@ -288,6 +288,10 @@ div[data-testid="stTextInput"] input {
     width: 100%;
     margin: 0 auto;
 }
+label[for="theme_toggle_top"],
+div[data-testid="stToggle"]:has(input#theme_toggle_top) {
+    display: none !important;
+}
 </style>
 '''
 css = (
