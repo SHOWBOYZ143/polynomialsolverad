@@ -1241,12 +1241,13 @@ def solver_view():
         st.session_state.coeff_text = st.session_state.reuse_coeffs
         del st.session_state.reuse_coeffs
 
-    st.session_state.root_count = st.selectbox(
-        "Roots to solve",
-        list(range(1, 101)),
-        index=max(0, min(99, st.session_state.get("root_count", 1) - 1))
-    )
-       
+    roots_col, _ = st.columns([1, 3])
+    with roots_col:
+        st.session_state.root_count = st.selectbox(
+            "Roots to solve",
+            list(range(1, 101)),
+            index=max(0, min(99, st.session_state.get("root_count", 1) - 1))
+        )  
 
     st.text_input(
         "Polynomial coefficients",
