@@ -1235,40 +1235,35 @@ def solver_view():
     # POLYNOMIAL INPUT
     # =========================
 if "coeff_text" not in st.session_state:
-   st.session_state.coeff_text = ""
+       st.session_state.coeff_text = ""
 
-if "reuse_coeffs" in st.session_state:
-    st.session_state.coeff_text = st.session_state.reuse_coeffs
-    del st.session_state.reuse_coeffs
-   
+    if "reuse_coeffs" in st.session_state:
+        st.session_state.coeff_text = st.session_state.reuse_coeffs
+        del st.session_state.reuse_coeffs
+       
 
-coeff_col, roots_col = st.columns([2, 1])
-with coeff_col:
     st.text_input(
         "Polynomial coefficients",
         key="coeff_text",
         placeholder="2, -3, 4"
     )
-    
-with roots_col:
     st.session_state.root_count = st.selectbox(
         "Roots to solve",
         list(range(1, 11)),
         index=max(0, min(9, st.session_state.get("root_count", 1) - 1))
     )
 
-try:
-    st.session_state.coeffs = parse_coeffs(st.session_state.coeff_text)
-except:
-    st.session_state.coeffs = None
+    try:
+        st.session_state.coeffs = parse_coeffs(st.session_state.coeff_text)
+    except:
+        st.session_state.coeffs = None
 
-if st.session_state.coeffs:
-    degree = len(st.session_state.coeffs) - 1
-    if st.session_state.root_count != degree:
-        st.warning(
-            f"Selected roots ({st.session_state.root_count}) must match the polynomial degree ({degree})."
-        )
-
+    if st.session_state.coeffs:
+        degree = len(st.session_state.coeffs) - 1
+        if st.session_state.root_count != degree:
+            st.warning(
+                f"Selected roots ({st.session_state.root_count}) must match the polynomial degree ({degree})."
+            )
     # =========================
     # SOLVE
     # =========================
