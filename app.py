@@ -308,7 +308,6 @@ css = (
     .replace("__BTN_DANGER_HOVER__", theme_vars["btn_danger_hover"])
 )
 st.markdown(css, unsafe_allow_html=True)
-    
 
 # ======================================================
 # App config
