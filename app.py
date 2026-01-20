@@ -1299,9 +1299,14 @@ def forced_password_change():
         st.success("Password updated")
         st.rerun()
 
+def render_welcome_message():
+    username = st.session_state.get("username")
+    if username:
+        st.markdown(f"**Welcome \"{username}\"**")
+
 def solver_view():
     st.subheader("Polynomial Solver")
-    st.markdown(f"**Welcome \"{st.session_state.username}\"**")
+    
 
     key_ns = f"{st.session_state.username}_{st.session_state.get('page','solver')}"
 
@@ -2262,6 +2267,7 @@ def delete_user_view():
 
 def admin_view():
     top_right_menu()
+    render_welcome_message()
     st.title("Admin Dashboard")
 
     # ===============================
@@ -2394,6 +2400,7 @@ def user_history_view():
  
 def user_view():
     top_right_menu()
+    render_welcome_message()
     st.title("User Dashboard")
 
     user_stats_view()
