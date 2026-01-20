@@ -45,20 +45,20 @@ if "page" not in st.session_state:
     st.session_state.page = "solver"
 is_dark_mode = st.session_state.theme_mode == "dark"
 theme_vars = {
-    "primary_color": "#60a5fa" if is_dark_mode else "#2563eb",
-    "primary_color_dark": "#3b82f6" if is_dark_mode else "#1d4ed8",
-    "primary_soft": "#0f172a" if is_dark_mode else "#dbeafe",
-    "card_border": "#1f2937" if is_dark_mode else "#93c5fd",
-    "card_bg": "#111827" if is_dark_mode else "#e0f2fe",
-    "page_bg": "linear-gradient(180deg, #0b1120 0%, #0f172a 100%)" if is_dark_mode else "linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%)",
-    "text_main": "#e2e8f0" if is_dark_mode else "#111827",
-    "text_muted": "#94a3b8" if is_dark_mode else "#4b5563",
-    "btn_primary": "#3b82f6" if is_dark_mode else "#2563eb",
-    "btn_primary_hover": "#2563eb" if is_dark_mode else "#1d4ed8",
-    "btn_secondary": "#0ea5e9" if is_dark_mode else "#0ea5e9",
-    "btn_secondary_hover": "#0284c7" if is_dark_mode else "#0284c7",
-    "btn_danger": "#f87171" if is_dark_mode else "#dc2626",
-    "btn_danger_hover": "#ef4444" if is_dark_mode else "#b91c1c",
+    "primary_color": "#2563eb",
+    "primary_color_dark": "#1d4ed8",
+    "primary_soft": "#dbeafe",
+    "card_border": "#93c5fd",
+    "card_bg": "#e0f2fe",
+    "page_bg": "linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%)",
+    "text_main": "#111827",
+    "text_muted": "#4b5563",
+    "btn_primary": "#2563eb",
+    "btn_primary_hover": "#1d4ed8",
+    "btn_secondary": "#0ea5e9",
+    "btn_secondary_hover": "#0284c7",
+    "btn_danger": "#dc2626",
+    "btn_danger_hover": "#b91c1c",
 }
 
 css_template = r'''
