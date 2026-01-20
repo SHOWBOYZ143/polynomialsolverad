@@ -17,6 +17,7 @@ from datetime import datetime
 from datetime import timedelta
 
 PBKDF2_ITERS = 200_000
+key_ns = ""
 PHONE_COUNTRIES = sorted(
     (
         {
