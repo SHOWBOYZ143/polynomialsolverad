@@ -249,6 +249,9 @@ div[data-testid="stSelectbox"] > div,
 div[data-testid="stTextInput"] input {
     width: 100%;
 }
+div[data-testid="stToggle"]:has(input[aria-label="Dark mode"]) {
+    display: none !important;
+}
 
 .password-strength {
     height: 8px;
@@ -1298,6 +1301,7 @@ def forced_password_change():
 
 def solver_view():
     st.subheader("Polynomial Solver")
+    st.markdown(f"**Welcome, {st.session_state.username}**")
 
     key_ns = f"{st.session_state.username}_{st.session_state.get('page','solver')}"
 
