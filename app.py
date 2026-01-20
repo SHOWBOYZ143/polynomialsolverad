@@ -47,12 +47,12 @@ is_dark_mode = st.session_state.theme_mode == "dark"
 theme_vars = {
     "primary_color": "#60a5fa" if is_dark_mode else "#2563eb",
     "primary_color_dark": "#3b82f6" if is_dark_mode else "#1d4ed8",
-    "primary_soft": "#1f2937" if is_dark_mode else "#dbeafe",
+    "primary_soft": "#0f172a" if is_dark_mode else "#dbeafe",
     "card_border": "#1f2937" if is_dark_mode else "#93c5fd",
     "card_bg": "#111827" if is_dark_mode else "#e0f2fe",
-    "page_bg": "linear-gradient(180deg, #0b1120 0%, #111827 100%)" if is_dark_mode else "linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%)",
-    "text_main": "#e5e7eb" if is_dark_mode else "#111827",
-    "text_muted": "#9ca3af" if is_dark_mode else "#4b5563",
+    "page_bg": "linear-gradient(180deg, #0b1120 0%, #0f172a 100%)" if is_dark_mode else "linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%)",
+    "text_main": "#e2e8f0" if is_dark_mode else "#111827",
+    "text_muted": "#94a3b8" if is_dark_mode else "#4b5563",
     "btn_primary": "#3b82f6" if is_dark_mode else "#2563eb",
     "btn_primary_hover": "#2563eb" if is_dark_mode else "#1d4ed8",
     "btn_secondary": "#0ea5e9" if is_dark_mode else "#0ea5e9",
@@ -222,8 +222,10 @@ div[data-testid="stSelectbox"] div[role="button"] {
     color: var(--text-main);
 }
 
-.stMarkdown,
+div[data-testid="stMarkdownContainer"],
+label,
 .stText,
+.stCaption,
 .stSubheader,
 .stHeader,
 .stTitle {
