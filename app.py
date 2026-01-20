@@ -48,21 +48,20 @@ theme_vars = {
     "primary_color": "#60a5fa" if is_dark_mode else "#2563eb",
     "primary_color_dark": "#3b82f6" if is_dark_mode else "#1d4ed8",
     "primary_soft": "#1f2937" if is_dark_mode else "#dbeafe",
-    "card_border": "#374151" if is_dark_mode else "#93c5fd",
+    "card_border": "#1f2937" if is_dark_mode else "#93c5fd",
     "card_bg": "#111827" if is_dark_mode else "#e0f2fe",
-    "page_bg": "#0b1120" if is_dark_mode else "linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%)",
-    "text_main": "#f9fafb" if is_dark_mode else "#111827",
+    "page_bg": "linear-gradient(180deg, #0b1120 0%, #111827 100%)" if is_dark_mode else "linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%)",
+    "text_main": "#e5e7eb" if is_dark_mode else "#111827",
     "text_muted": "#9ca3af" if is_dark_mode else "#4b5563",
-    "btn_primary": "#2563eb",
-    "btn_primary_hover": "#1d4ed8",
-    "btn_secondary": "#0ea5e9",
-    "btn_secondary_hover": "#0284c7",
-    "btn_danger": "#dc2626",
-    "btn_danger_hover": "#b91c1c",
+    "btn_primary": "#3b82f6" if is_dark_mode else "#2563eb",
+    "btn_primary_hover": "#2563eb" if is_dark_mode else "#1d4ed8",
+    "btn_secondary": "#0ea5e9" if is_dark_mode else "#0ea5e9",
+    "btn_secondary_hover": "#0284c7" if is_dark_mode else "#0284c7",
+    "btn_danger": "#f87171" if is_dark_mode else "#dc2626",
+    "btn_danger_hover": "#ef4444" if is_dark_mode else "#b91c1c",
 }
 
 css_template = r'''
-
 
 
 
@@ -201,6 +200,34 @@ div[data-testid="metric-container"] {
 .auth-scope div[data-testid="stTextInput"] input {
     background-color: var(--primary-soft);
     border: 1px solid var(--card-border);
+}
+div[data-testid="stTextInput"] input {
+    background-color: var(--primary-soft);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+}
+
+div[data-testid="stSelectbox"] > div {
+    background-color: var(--primary-soft);
+    border: 1px solid var(--card-border);
+}
+
+div[data-testid="stSelectbox"] [data-testid="stMarkdownContainer"],
+div[data-testid="stSelectbox"] svg,
+div[data-testid="stTextInput"] input::placeholder {
+    color: var(--text-muted);
+}
+
+div[data-testid="stSelectbox"] div[role="button"] {
+    color: var(--text-main);
+}
+
+.stMarkdown,
+.stText,
+.stSubheader,
+.stHeader,
+.stTitle {
+    color: var(--text-main);
 }
 
 div[data-testid="stSelectbox"],
