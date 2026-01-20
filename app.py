@@ -292,6 +292,10 @@ label[for="theme_toggle_top"],
 div[data-testid="stToggle"]:has(input#theme_toggle_top) {
     display: none !important;
 }
+div[data-testid="stToggle"]:has(span:contains("Dark mode")),
+label:has(span:contains("Dark mode")) {
+    display: none !important;
+}
 </style>
 '''
 css = (
