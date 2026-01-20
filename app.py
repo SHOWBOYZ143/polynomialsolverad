@@ -1100,6 +1100,7 @@ def init_state():
         coeff_text="",
         coeffs=None,
         roots=None,
+        root_count=1,
         xlim=(-10.0, 10.0),
         graph_fmt="PNG",
         login_fails=0,
@@ -1270,6 +1271,13 @@ if st.session_state.coeffs:
     # =========================
     if st.button("Solve and Plot", key=f"solve_btn_{key_ns}"):
         if st.session_state.coeffs:
+            degree = len(st.session_state.coeffs) - 1
+            if st.session_state.root_count != degree:
+                st.session_state.roots = None
+                st.error(
+                    f"Number of roots must match the polynomial degree ({degree})."
+                )
+                return
             with st.spinner("Solving and plotting..."):
                 st.session_state.roots = np.roots(st.session_state.coeffs)
                 roots_text = format_roots_for_storage(st.session_state.roots)
