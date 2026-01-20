@@ -93,8 +93,8 @@ div[data-testid="stAppViewContainer"] > .main {
 }
 
 div[data-testid="metric-container"] {
-    background-color: #0f1117;
-    border: 1px solid #2a2d3a;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
     padding: 16px;
     border-radius: 10px;
 }
