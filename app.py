@@ -32,6 +32,7 @@ PHONE_COUNTRIES = sorted(
 
 st.session_state.setdefault("recovery_verified", False)
 st.session_state.setdefault("reset_user", None)
+st.session_state.setdefault("theme_mode", "light")
 
 
 
@@ -58,6 +59,7 @@ theme_vars = {
     "btn_danger": "#dc2626",
     "btn_danger_hover": "#b91c1c",
 }
+css_template = Template("""
 
 st.markdown(f"""
 
@@ -245,7 +247,8 @@ div[data-testid="stTextInput"] input {
     margin: 0 auto;
 }
 </style>
-""", unsafe_allow_html=True)
+""")
+st.markdown(css_template.safe_substitute(theme_vars), unsafe_allow_html=True)
     
 
 # ======================================================
