@@ -762,9 +762,6 @@ def hash_answer(answer: str) -> str:
     return hashlib.sha256(normalised.encode("utf-8")).hexdigest()
     
 
-
-
-
 def validate_password_strength(password: str) -> tuple[bool, str]:
     if len(password) < 5:
         return False, "Password must be at least 5 characters long."
@@ -775,6 +772,35 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
     if not any(not char.isalnum() for char in password):
         return False, "Password must include at least one special character."
     return True, ""
+
+def password_strength_score(password: str) -> tuple[int, str]:
+    if not password:
+        return 0, "Enter a password"
+    score = 0
+    if len(password) >= 8:
+        score += 1
+    if len(password) >= 12:
+        score += 1
+    if any(char.islower() for char in password):
+        score += 1
+    if any(char.isupper() for char in password):
+        score += 1
+    if any(char.isdigit() for char in password):
+        score += 1
+    if any(not char.isalnum() for char in password):
+        score += 1
+
+    if score <= 1:
+        label = "Weak"
+    elif score <= 3:
+        label = "Fair"
+    elif score <= 4:
+        label = "Good"
+    else:
+        label = "Strong"
+
+    percent = int(score / 6 * 100)
+    return percent, label
 
 
 
@@ -1089,6 +1115,8 @@ def login_view():
 def forced_password_change():
     st.warning("Change your password before proceeding")
     p1 = st.text_input("New password", type="password")
+    strength_value, strength_label = password_strength_score(p1)
+    st.progress(strength_value, text=f"Strength: {strength_label}")
     p2 = st.text_input("Confirm password", type="password")
     if st.button("Save"):
         if p1 != p2:
@@ -1820,6 +1848,8 @@ def password_recovery_view():
     st.success("Identity verified. Set a new password.")
 
     new_pw = st.text_input("New password", type="password")
+    strength_value, strength_label = password_strength_score(new_pw)
+    st.progress(strength_value, text=f"Strength: {strength_label}")
     confirm_pw = st.text_input("Confirm password", type="password")
 
     if st.button("Reset password"):
@@ -1856,6 +1886,8 @@ def signup_view():
             with st.form("signup_form"):
                 u = st.text_input("Username", key="signup_user").strip()
                 p = st.text_input("Password", type="password", key="signup_pass")
+                strength_value, strength_label = password_strength_score(p)
+                st.progress(strength_value, text=f"Strength: {strength_label}")
                 phone = st.text_input("Phone number (required)", key="signup_phone")
                 email = st.text_input("Email (optional)", key="signup_email")
                 action_col, back_col = st.columns([1, 1])
@@ -1918,6 +1950,8 @@ def create_user_view():
                 u = st.text_input("Username", key="create_user_name")
             with col_b:
                 p = st.text_input("Temporary Password", type="password", key="create_user_pass")
+                strength_value, strength_label = password_strength_score(p)
+                st.progress(strength_value, text=f"Strength: {strength_label}")
 
             col_c, col_d = st.columns(2)
             with col_c:
