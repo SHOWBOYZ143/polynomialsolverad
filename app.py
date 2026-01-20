@@ -290,6 +290,7 @@ RECOVERY_QUESTIONS = [
 
 
 
+
 @st.cache_data(ttl=30)
 def get_user_stats(username):
     con = get_db()
@@ -474,6 +475,7 @@ def ensure_history_schema_v2():
         """.format(id_def=_history_id_definition()))
         con.commit()
         con.close()
+        ensure_history_indexes()
         return
 
     # Inspect existing columns
@@ -518,6 +520,7 @@ def ensure_history_schema_v2():
 
     con.commit()
     con.close()
+    ensure_history_indexes()
 
 def ensure_users_schema_v2():
     con = get_db()
@@ -2130,7 +2133,9 @@ def top_right_menu():
 # ======================================================
 # Main
 # ======================================================
-ensure_schema()
+if not st.session_state.get("schema_ready", False):
+    ensure_schema()
+    st.session_state.schema_ready = True
 init_state()
 
 st.session_state.setdefault("show_history", False)
