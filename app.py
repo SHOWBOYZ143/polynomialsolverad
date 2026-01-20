@@ -1301,7 +1301,7 @@ def forced_password_change():
 
 def solver_view():
     st.subheader("Polynomial Solver")
-   st.markdown(f"**Welcome \"{st.session_state.username}\"**")
+    st.markdown(f"**Welcome \"{st.session_state.username}\"**")
 
     key_ns = f"{st.session_state.username}_{st.session_state.get('page','solver')}"
 
