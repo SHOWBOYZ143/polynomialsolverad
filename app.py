@@ -1242,18 +1242,19 @@ if "reuse_coeffs" in st.session_state:
    
 
 coeff_col, roots_col = st.columns([2, 1])
-    with coeff_col:
-        st.text_input(
-            "Polynomial coefficients",
-            key="coeff_text",
-            placeholder="2, -3, 4"
-        )
-    with roots_col:
-        st.session_state.root_count = st.selectbox(
-            "Roots to solve",
-            list(range(1, 11)),
-            index=max(0, min(9, st.session_state.get("root_count", 1) - 1))
-        )
+with coeff_col:
+    st.text_input(
+        "Polynomial coefficients",
+        key="coeff_text",
+        placeholder="2, -3, 4"
+    )
+    
+with roots_col:
+    st.session_state.root_count = st.selectbox(
+        "Roots to solve",
+        list(range(1, 11)),
+        index=max(0, min(9, st.session_state.get("root_count", 1) - 1))
+    )
 
 try:
     st.session_state.coeffs = parse_coeffs(st.session_state.coeff_text)
