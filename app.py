@@ -10,12 +10,24 @@ import matplotlib.pyplot as plt
 import io
 import psycopg2
 import re
+import phonenumbers
 
 import csv
 from datetime import datetime
 from datetime import timedelta
 
 PBKDF2_ITERS = 200_000
+PHONE_COUNTRIES = sorted(
+    (
+        {
+            "label": f"+{phonenumbers.country_code_for_region(region)} ({region})",
+            "code": f"+{phonenumbers.country_code_for_region(region)}",
+            "region": region,
+        }
+        for region in phonenumbers.SUPPORTED_REGIONS
+    ),
+    key=lambda item: (item["region"] != "GH", item["label"]),
+)
 
 st.session_state.setdefault("recovery_verified", False)
 st.session_state.setdefault("reset_user", None)
@@ -804,12 +816,24 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
     if not any(not char.isalnum() for char in password):
         return False, "Password must include at least one special character."
     return True, ""
-
-def validate_phone_number(phone_digits: str) -> tuple[bool, str]:
+def validate_phone_number(phone_digits: str, region: str) -> tuple[bool, str, str]:
     digits_only = re.sub(r"\D", "", phone_digits or "")
-    if len(digits_only) < 9 or len(digits_only) > 15:
-        return False, "Phone number digits must be at least 9 and not more than 15."
-    return True, ""
+    if not digits_only:
+        return False, "Phone number is required.", ""
+    try:
+        parsed = phonenumbers.parse(digits_only, region)
+    except phonenumbers.NumberParseException:
+        return False, "Phone number is not valid for the selected country.", ""
+
+    reason = phonenumbers.is_possible_number_with_reason(parsed)
+    if reason == phonenumbers.ValidationResult.TOO_SHORT:
+        return False, "Phone number is too short for the selected country.", ""
+    if reason == phonenumbers.ValidationResult.TOO_LONG:
+        return False, "Phone number is too long for the selected country.", ""
+    if not phonenumbers.is_valid_number(parsed):
+        return False, "Phone number is not valid for the selected country.", ""
+
+    return True, "", phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
 
 def password_strength_score(password: str) -> tuple[int, str, str]:
     if not password:
@@ -1935,17 +1959,32 @@ def signup_view():
         st.markdown("<div class=\"auth-scope\">", unsafe_allow_html=True)
 
         with st.container(border=True):
-            u = st.text_input("Username", key="signup_user").strip()
+           u = st.text_input("Username", key="signup_user").strip()
             p = st.text_input("Password", type="password", key="signup_pass")
             render_password_strength(p)
-            phone = st.text_input("Phone number (required)", key="signup_phone")
+            st.markdown("**Phone number (required)**")
+            code_col, phone_col = st.columns([1, 2])
+            with code_col:
+                country = st.selectbox(
+                    "Country code",
+                    PHONE_COUNTRIES,
+                    index=0,
+                    key="signup_country_code",
+                    label_visibility="collapsed",
+                    format_func=lambda item: item["label"]
+                )
+            with phone_col:
+                phone_digits = st.text_input(
+                    "Phone number (required)",
+                    key="signup_phone",
+                    label_visibility="collapsed"
+                )
             email = st.text_input("Email (optional)", key="signup_email")
             action_col, back_col = st.columns([1, 1])
             with action_col:
                 submitted = st.button("Create account", key="signup_submit")
             with back_col:
                 back_clicked = st.button("Back to login", key="signup_back")
-
             if back_clicked:
                 st.session_state.page = "login"
                 st.markdown("</div>", unsafe_allow_html=True)
@@ -1960,13 +1999,13 @@ def signup_view():
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    ok, msg = validate_phone_number(phone_digits)
+    ok, msg, formatted_phone = validate_phone_number(phone_digits, country["region"])
     if not ok:
         st.error(msg)
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    phone = f"{country_code.split()[0]}{re.sub(r'\\D', '', phone_digits)}"
+    phone = formatted_phone
 
     ok, msg = validate_password_strength(p)
     if not ok:
@@ -2010,18 +2049,24 @@ def create_user_view():
                 p = st.text_input("Temporary Password", type="password", key="create_user_pass")
                 render_password_strength(p)
 
-            col_c, col_d, col_e = st.columns([1, 1, 2])
-            with col_c:
-                r = st.selectbox("Role", ["user", "admin"], key="create_user_role")
-            with col_d:
-                country_code = st.selectbox(
+            r = st.selectbox("Role", ["user", "admin"], key="create_user_role")
+            st.markdown("**Phone number (required)**")
+            code_col, phone_col = st.columns([1, 2])
+            with code_col:
+                country = st.selectbox(
                     "Country code",
-                    ["+233 (Ghana)", "+234 (Nigeria)", "+27 (South Africa)", "+1 (USA/Canada)", "+44 (UK)"],
+                    PHONE_COUNTRIES,
                     index=0,
-                    key="create_user_country_code"
+                    key="create_user_country_code",
+                    label_visibility="collapsed",
+                    format_func=lambda item: item["label"]
                 )
-            with col_e:
-                phone_digits = st.text_input("Phone number (required)", key="create_user_phone")
+            with phone_col:
+                phone_digits = st.text_input(
+                    "Phone number (required)",
+                    key="create_user_phone",
+                    label_visibility="collapsed"
+                )
 
             email = st.text_input("Email (optional)", key="create_user_email")
 
@@ -2030,13 +2075,12 @@ def create_user_view():
                     st.error("Username, password, and phone number are required.")
                     return
 
-                ok, msg = validate_phone_number(phone_digits)
+                ok, msg, formatted_phone = validate_phone_number(phone_digits, country["region"])
                 if not ok:
                     st.error(msg)
                     return
 
-                phone = f"{country_code.split()[0]}{re.sub(r'\\D', '', phone_digits)}"
-
+                phone = formatted_phone
                
 
                 ok, msg = validate_password_strength(p)
