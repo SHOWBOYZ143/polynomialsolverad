@@ -805,10 +805,10 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
         return False, "Password must include at least one special character."
     return True, ""
 
-def validate_phone_number(phone: str) -> tuple[bool, str]:
-    digits_only = re.sub(r"\D", "", phone or "")
-    if len(digits_only) > 15:
-        return False, "Phone number digits must not be more than 15."
+def validate_phone_number(phone_digits: str) -> tuple[bool, str]:
+    digits_only = re.sub(r"\D", "", phone_digits or "")
+    if len(digits_only) < 9 or len(digits_only) > 15:
+        return False, "Phone number digits must be at least 9 and not more than 15."
     return True, ""
 
 def password_strength_score(password: str) -> tuple[int, str, str]:
@@ -1955,16 +1955,18 @@ def signup_view():
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    if not u or not p or not phone:
+    if not u or not p or not phone_digits:
         st.error("Username, password, and phone number are required.")
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    def validate_phone_number(phone: str) -> tuple[bool, str]:
-        digits_only = re.sub(r"\D", "", phone or "")
-    if len(digits_only) > 15:
-        return False, "Phone number digits must not be more than 15."
-    return True, ""
+    ok, msg = validate_phone_number(phone_digits)
+    if not ok:
+        st.error(msg)
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+
+    phone = f"{country_code.split()[0]}{re.sub(r'\\D', '', phone_digits)}"
 
     ok, msg = validate_password_strength(p)
     if not ok:
@@ -2008,23 +2010,34 @@ def create_user_view():
                 p = st.text_input("Temporary Password", type="password", key="create_user_pass")
                 render_password_strength(p)
 
-            col_c, col_d = st.columns(2)
+            col_c, col_d, col_e = st.columns([1, 1, 2])
             with col_c:
                 r = st.selectbox("Role", ["user", "admin"], key="create_user_role")
             with col_d:
-                phone = st.text_input("Phone number (required)", key="create_user_phone")
+                country_code = st.selectbox(
+                    "Country code",
+                    ["+233 (Ghana)", "+234 (Nigeria)", "+27 (South Africa)", "+1 (USA/Canada)", "+44 (UK)"],
+                    index=0,
+                    key="create_user_country_code"
+                )
+            with col_e:
+                phone_digits = st.text_input("Phone number (required)", key="create_user_phone")
 
             email = st.text_input("Email (optional)", key="create_user_email")
 
             if st.button("Create user"):
-                if not u or not p or not phone:
+                if not u or not p or not phone_digits:
                     st.error("Username, password, and phone number are required.")
                     return
 
-                ok, msg = validate_phone_number(phone)
+                ok, msg = validate_phone_number(phone_digits)
                 if not ok:
                     st.error(msg)
                     return
+
+                phone = f"{country_code.split()[0]}{re.sub(r'\\D', '', phone_digits)}"
+
+               
 
                 ok, msg = validate_password_strength(p)
                 if not ok:
