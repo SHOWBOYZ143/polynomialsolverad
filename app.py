@@ -1277,7 +1277,7 @@ if st.session_state.coeffs:
                 st.error(
                     f"Number of roots must match the polynomial degree ({degree})."
                 )
-                return
+                st.stop()
             with st.spinner("Solving and plotting..."):
                 st.session_state.roots = np.roots(st.session_state.coeffs)
                 roots_text = format_roots_for_storage(st.session_state.roots)
@@ -1290,6 +1290,7 @@ if st.session_state.coeffs:
         else:
             st.session_state.roots = None
             st.error("Enter at least two coefficients, separated by commas.")
+
 
     # =========================
     # ROOTS (IMMEDIATELY BELOW SOLVE)
