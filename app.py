@@ -249,9 +249,11 @@ div[data-testid="stSelectbox"] > div,
 div[data-testid="stTextInput"] input {
     width: 100%;
 }
-div[data-testid="stToggle"]:has(input[aria-label="Dark mode"]) {
-    display: none !important;
-}
+.welcome-message {
+    font-size: 2.25rem;
+    font-weight: 600;
+    font-family: "Poppins", "Segoe UI", sans-serif;
+    margin-bottom: 0.25rem;
 
 .password-strength {
     height: 8px;
@@ -1302,7 +1304,10 @@ def forced_password_change():
 def render_welcome_message():
     username = st.session_state.get("username")
     if username:
-        st.markdown(f"**Welcome \"{username}\"**")
+        st.markdown(
+            f"<div class=\"welcome-message\">Welcome {username}</div>",
+            unsafe_allow_html=True,
+        )
 
 def solver_view():
     st.subheader("Polynomial Solver")
