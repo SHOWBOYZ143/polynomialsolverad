@@ -1959,7 +1959,7 @@ def signup_view():
         st.markdown("<div class=\"auth-scope\">", unsafe_allow_html=True)
 
         with st.container(border=True):
-           u = st.text_input("Username", key="signup_user").strip()
+            u = st.text_input("Username", key="signup_user").strip()
             p = st.text_input("Password", type="password", key="signup_pass")
             render_password_strength(p)
             st.markdown("**Phone number (required)**")
